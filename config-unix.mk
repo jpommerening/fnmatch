@@ -34,6 +34,7 @@ OBJS += src/scanner.o
 OBJS += src/util.o
 OBJS += src/compiler.o
 OBJS += src/vm.o
+OBJS += src/posix.o
 
 ifeq (SunOS,$(uname_S))
 CPPFLAGS +=

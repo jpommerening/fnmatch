@@ -26,17 +26,13 @@
  */
 #ifndef _FNMATCH_H_
 #define _FNMATCH_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <unistd.h>
 #include <stddef.h>
-
-#define FNMATCH_ESCAPE '\\'
-#define FNMATCH_CHARS_START '['
-#define FNMATCH_CHARS_END ']'
-#define FNMATCH_ONE '?'
-#define FNMATCH_ANY '*'
-#define FNMATCH_DEEP '*'
-#define FNMATCH_SEP '/'
-#define FNMATCH_EOP '\0'
 
 #define FNMATCH_EXTERN extern
 
@@ -106,22 +102,67 @@ struct fnmatch_match_s {
   char*  argv[1];
 };
 
+/* MARK: - Basic pattern matching API *//**
+ * @name Basic pattern matching API
+ * Use this API if you just want to match simple strings.
+ * @{
+ */
 FNMATCH_EXTERN void fnmatch_pattern_init( fnmatch_pattern_t* pattern );
 FNMATCH_EXTERN void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern );
 FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr );
 FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* str );
+/** @} */
 
+/* MARK: - Resumeable API *//**
+ * @name Resumeable API
+ * Use this if you want to match sets (trees) of strings and push new data on demand.
+ * This requires you to loop through multiple invocations of the match function until
+ * it's done.
+ * @{
+ */
 FNMATCH_EXTERN void fnmatch_context_init( fnmatch_context_t* context, fnmatch_pattern_t* pattern );
 FNMATCH_EXTERN void fnmatch_context_destroy( fnmatch_context_t* context );
-FNMATCH_EXTERN fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context );
 FNMATCH_EXTERN void fnmatch_context_reset( fnmatch_context_t* context );
+FNMATCH_EXTERN fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context );
 FNMATCH_EXTERN void fnmatch_context_push( fnmatch_context_t* context, const char* str );
 FNMATCH_EXTERN const char * fnmatch_context_pop( fnmatch_context_t* context );
+/** @} */
 
+/* MARK: - Callback driven API *//**
+ * @name Callback driven API
+ * If you don't want to match sets without iterating through a loop, use this API.
+ * Interactions like pushing data to the stack are automated with callbacks.
+ * @{
+ */
 FNMATCH_EXTERN void fnmatch_scanner_init( fnmatch_scanner_t* scanner, fnmatch_pattern_t* pattern,
   fnmatch_push_cb push_cb, fnmatch_pop_cb pop_cb, fnmatch_match_cb match_cb );
 FNMATCH_EXTERN void fnmatch_scanner_destroy( fnmatch_scanner_t* scanner );
-FNMATCH_EXTERN fnmatch_state_t fnmatch_scanner_match( fnmatch_scanner_t* scanner, void* info );
 FNMATCH_EXTERN void fnmatch_scanner_reset( fnmatch_scanner_t* scanner );
+FNMATCH_EXTERN fnmatch_state_t fnmatch_scanner_match( fnmatch_scanner_t* scanner, void* info );
+/** @} */
+
+/* MARK: - POSIX.2 API *//**
+ * @name POSIX.2 API
+ * This is the simplest possible form. Allows not much control..
+ * @{
+ */
+
+/* Some systems #define these macros in <unistd.h> so we need to #undef them first */
+#undef FNM_PATHNAME
+#undef FNM_NOESCAPE
+#undef FNM_PERIOD
+#undef FNM_NOMATCH
+
+/* The similarity to Linux is coincidental ;) */
+#define FNM_PATHNAME (1 << 0)
+#define FNM_NOESCAPE (1 << 1)
+#define FNM_PERIOD (1 << 2)
+#define	FNM_NOMATCH 1
+FNMATCH_EXTERN int fnmatch( const char*, const char*, int );
+/** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

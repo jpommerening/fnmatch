@@ -1,6 +1,15 @@
 #ifndef _FNMATCH_INTERNAL_H_
 #define _FNMATCH_INTERNAL_H_
 
+#define FNMATCH_ESCAPE '\\'
+#define FNMATCH_CHARS_START '['
+#define FNMATCH_CHARS_END ']'
+#define FNMATCH_ONE '?'
+#define FNMATCH_ANY '*'
+#define FNMATCH_DEEP '*'
+#define FNMATCH_SEP '/'
+#define FNMATCH_EOP '\0'
+
 fnmatch_state_t fnmatch_compile( fnmatch_pattern_t *pattern );
 fnmatch_state_t fnmatch_vm_next( fnmatch_context_t *context );
 fnmatch_state_t fnmatch_vm_prev( fnmatch_context_t *context );
