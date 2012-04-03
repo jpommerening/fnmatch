@@ -27,8 +27,8 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
 
   switch( context->state ) {
     case FNMATCH_MATCH:
-    /*printf( "FNMATCH_MATCH\n" );*/
       if( context->opcode == FNMATCH_OP_END ) {
+        context->match++;
         context->state = FNMATCH_POP;
       } else if( context->opcode == FNMATCH_OP_SEP ) {
         context->state = fnmatch_vm_next( context );
@@ -37,7 +37,6 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
       }
       break;
     case FNMATCH_NOMATCH:
-    /*printf( "FNMATCH_NOMATCH\n" );*/
       if( fnmatch_vm_retry( context ) == FNMATCH_CONTINUE ) {
         context->state = fnmatch_vm_op( context );
       } else {
@@ -46,29 +45,40 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
       break;
     case FNMATCH_PUSH:
     case FNMATCH_POP:
-    /*printf( "FNMATCH_PUSH or FNMATCH_POP\n" );*/
       context->state = FNMATCH_ERROR;
       break;
     case FNMATCH_CONTINUE:
-    /*printf( "FNMATCH_CONTINUE\n" );*/
-      if( context->offset == context->buflen ) {
+      printf( "Continue\n" );
+      /*if( context->offset == context->buflen ) {
         context->state = FNMATCH_PUSH;
-      } else if( context->offset > context->buflen || context->buflen == 0 ) {
+      } else*/ if( context->offset > context->buflen || context->buflen == 0 ) {
         context->state = FNMATCH_STOP;
       } else {
         context->state = fnmatch_vm_op( context );
       }
       break;
     case FNMATCH_STOP:
-    /*printf( "FNMATCH_STOP\n" );*/
       break;
     default:
     case FNMATCH_ERROR:
-    /*printf( "FNMATCH_ERROR\n" );*/
       break;
   }
 
   return context->state;
+}
+
+void fnmatch_context_debug( fnmatch_context_t* context ) {
+  static const char* state[] = {
+    [FNMATCH_MATCH] = "FNMATCH_MATCH",
+    [FNMATCH_NOMATCH] = "FNMATCH_NOMATCH",
+    [FNMATCH_PUSH] = "FNMATCH_PUSH",
+    [FNMATCH_POP] = "FNMATCH_POP",
+    [FNMATCH_CONTINUE] = "FNMATCH_CONTINUE",
+    [FNMATCH_STOP] = "FNMATCH_STOP",
+    [FNMATCH_ERROR] = "FNMATCH_ERROR"
+  };
+
+  printf( "[%i:%s]: \n", context->state, state[context->state] );
 }
 
 void fnmatch_context_reset( fnmatch_context_t* context ) {

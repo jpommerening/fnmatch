@@ -25,7 +25,7 @@ static void fnmatch__compiler_opcode( fnmatch_pattern_t* pattern, fnmatch_opcode
   char word[2] = { 0, 0 };
   word[0] = opcode;
   fnmatch__compiler_append( pattern, &(word[0]), 2 );
-/*printf( "Push opcode %i\n", opcode );*/
+  printf( "Push opcode %i\n", opcode );
 }
 
 static int character_in_set( char c, const char* set, size_t length ) {
@@ -51,7 +51,7 @@ static size_t fnmatch__compiler_oparg(
   }
   fnmatch__compiler_append( pattern, data+j, i-j );
   if( pattern->proglen != start ) {
-  /*printf( "Push oparg %i:%s\n", (int) (pattern->proglen - start), &(pattern->program[start]) );*/
+    printf( "Push oparg %i:%s\n", (int) (pattern->proglen - start), &(pattern->program[start]) );
     pattern->program[start-1] = (char) (pattern->proglen - start);
     fnmatch__compiler_append( pattern, &(pattern->program[start-1]), 1 );
   }
@@ -81,7 +81,7 @@ static size_t fnmatch__compiler_unary( fnmatch_pattern_t* pattern, const char* e
   } else if( expr[0] == FNMATCH_SEP ) {
     fnmatch__compiler_opcode( pattern, FNMATCH_OP_SEP );
     return 1;
-  } else if( expr[0] == FNMATCH_EOP ) {
+  } else if( expr[0] == '\0' ) {
     fnmatch__compiler_opcode( pattern, FNMATCH_OP_END );
     return 0;
   }
@@ -146,6 +146,7 @@ fnmatch_state_t fnmatch_compile( fnmatch_pattern_t* pattern ) {
   pattern->parts   = 0;
   
   do {
+    expr += length;
     switch( *expr ) {
       case FNMATCH_SEP:
         length  = fnmatch__compiler_unary( pattern, expr );
@@ -159,9 +160,6 @@ fnmatch_state_t fnmatch_compile( fnmatch_pattern_t* pattern ) {
         length  = fnmatch__compiler_unary( pattern, expr );
         groups += 1;
         break;
-      case FNMATCH_EOP:
-        length  = fnmatch__compiler_unary( pattern, expr );
-        break;
       case FNMATCH_CHARS_START:
         length  = fnmatch__compiler_chars( pattern, expr );
         mchars += 1;
@@ -171,9 +169,11 @@ fnmatch_state_t fnmatch_compile( fnmatch_pattern_t* pattern ) {
         length  = fnmatch__compiler_fixed( pattern, expr );
         mchars += length;
         break;
+      case '\0':
+        length  = fnmatch__compiler_unary( pattern, expr );
+        break;
     }
-    expr += length;
-  } while( *expr != FNMATCH_EOP );
+  } while( *expr != '\0' );
 
   pattern->mchars = mchars;
   pattern->groups = groups;

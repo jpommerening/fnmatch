@@ -5,6 +5,11 @@
 int fnmatch( const char* expr, const char* str, int flags ) {
   fnmatch_state_t   state;
   fnmatch_pattern_t pattern;
+
+  if( !(flags & FNM_PATHNAME) ) return -1;
+  if(  (flags & FNM_PERIOD)   ) return -1;
+  if(  (flags & FNM_NOESCAPE) ) return -1;
+
   fnmatch_pattern_init( &pattern );
   state = fnmatch_pattern_compile( &pattern, expr );
   if( state == FNMATCH_ERROR ) return -1;
