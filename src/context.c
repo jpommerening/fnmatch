@@ -39,8 +39,7 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
     case FNMATCH_NOMATCH:
       printf( "FNMATCH_NOMATCH\n" );
       if( fnmatch_vm_retry( context ) == FNMATCH_CONTINUE ) {
-        context->state  = fnmatch_vm_op( context );
-        context->opcode = fnmatch_vm_opcode( context );
+        context->state = fnmatch_vm_op( context );
       } else {
         context->state = FNMATCH_POP;
       }
@@ -57,8 +56,7 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
       } else if( context->offset > context->buflen || context->buflen == 0 ) {
         context->state = FNMATCH_STOP;
       } else {
-        context->state  = fnmatch_vm_op( context );
-        context->opcode = fnmatch_vm_opcode( context );
+        context->state = fnmatch_vm_op( context );
       }
       break;
     case FNMATCH_STOP:

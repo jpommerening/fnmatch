@@ -21,6 +21,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+E =
 CSTDFLAG = --std=c89 -pedantic -Wall -Wextra
 CFLAGS += -g
 LINKFLAGS = 
@@ -69,3 +70,9 @@ fnmatch.a: $(OBJS)
 
 src/%.o: src/%.c include/fnmatch.h src/internal.h
 	$(CC) $(CSTDFLAG) $(CPPFLAGS) -Isrc $(CFLAGS) -c $< -o $@
+
+clean-platform:
+	-#
+
+distclean-platform:
+	-#

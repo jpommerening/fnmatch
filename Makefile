@@ -38,3 +38,16 @@ endif
 all: fnmatch.a
 
 
+.PHONY: clean clean-platform distclean distclean-platform test bench
+
+test: test/run-tests$(E)
+	test/run-tests
+
+bench: test/run-benchmarks$(E)
+	test/run-benchmarks
+
+clean: clean-platform
+	$(RM) -f src/*.o *.a test/run-tests$(E) test/run-benchmarks$(E)
+
+distclean: distclean-platform
+	$(RM) -f src/*.o *.a test/run-tests$(E) test/run-benchmarks$(E)

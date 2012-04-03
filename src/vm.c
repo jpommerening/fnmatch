@@ -208,21 +208,16 @@ fnmatch_state_t fnmatch_vm_rewind( fnmatch_context_t *context ) {
   return FNMATCH_CONTINUE;
 }
 
-fnmatch_opcode_t fnmatch_vm_opcode( fnmatch_context_t *context ) {
-  assert( context );
-  return FNMATCHCTX_OPCODE(context);
-}
-
 #include <stdio.h>
 
 fnmatch_state_t fnmatch_vm_op( fnmatch_context_t *context ) {
-  fnmatch_opcode_t opcode = FNMATCHCTX_OPCODE(context);
   size_t oplen = FNMATCHCTX_OPLEN(context);
   char*  oparg = oplen > 0 ? FNMATCHCTX_OPARG(context) : NULL;
   char*  str   = FNMATCHCTX_STR(context);
   
-  printf( "OPCODE %i ON %s\n", opcode, str );
-  switch( opcode ) {
+  context->opcode = FNMATCHCTX_OPCODE(context);
+  printf( "OPCODE %i ON %s\n", context->opcode, str );
+  switch( context->opcode ) {
     case FNMATCH_OP_FIXED: return fnmatch__vm_fixed( context, str, oplen, oparg );
     case FNMATCH_OP_CHARS: return fnmatch__vm_chars( context, str, oplen, oparg );
     case FNMATCH_OP_ONE:   return fnmatch__vm_one( context, str );
@@ -231,7 +226,6 @@ fnmatch_state_t fnmatch_vm_op( fnmatch_context_t *context ) {
     case FNMATCH_OP_SEP:   return fnmatch__vm_sep( context, str );
     case FNMATCH_OP_END:   return fnmatch__vm_end( context, str );
     default:
-      fprintf( stderr, "Op: %i @ %i\n", opcode, (int) context->opptr );
       return FNMATCH_ERROR;
   }
   

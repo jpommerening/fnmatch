@@ -7,7 +7,6 @@ fnmatch_state_t fnmatch_vm_prev( fnmatch_context_t *context );
 fnmatch_state_t fnmatch_vm_retry( fnmatch_context_t *context );
 fnmatch_state_t fnmatch_vm_rewind( fnmatch_context_t *context );
 fnmatch_state_t fnmatch_vm_op( fnmatch_context_t *context );
-fnmatch_opcode_t fnmatch_vm_opcode( fnmatch_context_t *context );
 
 #define FNMATCH_ALLOC(mem,n,alloc) mem = _alloc( sizeof(*mem) * n, alloc )
 #define FNMATCH_GROW(mem,n,alloc) mem = _grow( mem, sizeof(*mem) * n, alloc )
