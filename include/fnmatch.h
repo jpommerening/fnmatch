@@ -156,8 +156,10 @@ FNMATCH_EXTERN fnmatch_state_t fnmatch_scanner_match( fnmatch_scanner_t* scanner
 /* The similarity to Linux is coincidental ;) */
 #define FNM_PATHNAME (1 << 0)
 #define FNM_NOESCAPE (1 << 1)
-#define FNM_PERIOD (1 << 2)
+#define FNM_PERIOD   (1 << 2)
+
 #define	FNM_NOMATCH 1
+#define FNM_NOSYS  -1
 FNMATCH_EXTERN int fnmatch( const char*, const char*, int );
 /** @} */
 
