@@ -8,7 +8,37 @@ typedef struct test_pattern_s {
 } test_pattern_t;
 
 static const test_pattern_t data[] = {
-  { "t*est", "test", "t/est" },
+
+  /* fixed string */
+  { "test", "test", "test " },
+
+  /* question mark */
+  { "tes?", "test", "tes" },
+
+  /* asterisk */
+  { "t*t", "tt", "tta" },
+  { "t*t", "tatt", "t" },
+
+  /* brackets */
+  { "[qrstu]es[a-z]", "test", "best" },
+
+  /* separators */
+  { "t*/est", "test/est", "test" },
+
+  /* "deep" matching asterisk */
+  { "**.[ch]", "test/test.c", "test.d" },
+  { "**/test/**.c", "this/is/a/test/file.c", "this/test/" },
+
+  /* escaping -- remember: one backslash is for the C compiler */
+  { "t\\?st", "t?st", "test" },
+  { "t\\*st", "t*st", "test" },
+  { "t\\[e]st", "t[e]st", "test" },
+  { "t\\**st", "t*est", "t*e/st" },
+  { "t\\*\\*t", "t**t", "t***t" },
+
+  /* TBD: An escaped slash makes "t/st" one fixed string, but what shall happen next? */
+  /*      The behaviour depends on how much data is available... */
+  { "t\\/st", "t/st", "t\\/st" },
 };
 
 test_t test_pattern( test_pattern_t* data ) {
