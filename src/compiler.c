@@ -25,7 +25,7 @@ static void fnmatch__compiler_opcode( fnmatch_pattern_t* pattern, fnmatch_opcode
   char word[2] = { 0, 0 };
   word[0] = opcode;
   fnmatch__compiler_append( pattern, &(word[0]), 2 );
-  printf( "Push opcode %i\n", opcode );
+  /*printf( "Push opcode %i\n", opcode );*/
 }
 
 static int character_in_set( char c, const char* set, size_t length ) {
@@ -51,7 +51,7 @@ static size_t fnmatch__compiler_oparg(
   }
   fnmatch__compiler_append( pattern, data+j, i-j );
   if( pattern->proglen != start ) {
-    printf( "Push oparg %i:%s\n", (int) (pattern->proglen - start), &(pattern->program[start]) );
+    /*printf( "Push oparg %i:%s\n", (int) (pattern->proglen - start), &(pattern->program[start]) );*/
     pattern->program[start-1] = (char) (pattern->proglen - start);
     fnmatch__compiler_append( pattern, &(pattern->program[start-1]), 1 );
   }

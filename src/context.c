@@ -45,13 +45,14 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
       break;
     case FNMATCH_PUSH:
     case FNMATCH_POP:
-      context->state = FNMATCH_ERROR;
+      context->state = FNMATCH_STOP;
       break;
     case FNMATCH_CONTINUE:
-      printf( "Continue\n" );
+fnmatch_context_match_continue:
       /*if( context->offset == context->buflen ) {
         context->state = FNMATCH_PUSH;
-      } else*/ if( context->offset > context->buflen || context->buflen == 0 ) {
+      } else*/
+      if( context->offset > context->buflen || context->buflen == 0 ) {
         context->state = FNMATCH_STOP;
       } else {
         context->state = fnmatch_vm_op( context );
@@ -59,26 +60,14 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
       break;
     case FNMATCH_STOP:
       break;
-    default:
     case FNMATCH_ERROR:
       break;
   }
+  /* Yeah I know; but this time it's fine. Trust me. */
+  if( context->state == FNMATCH_CONTINUE )
+    goto fnmatch_context_match_continue;
 
   return context->state;
-}
-
-void fnmatch_context_debug( fnmatch_context_t* context ) {
-  static const char* state[] = {
-    [FNMATCH_MATCH] = "FNMATCH_MATCH",
-    [FNMATCH_NOMATCH] = "FNMATCH_NOMATCH",
-    [FNMATCH_PUSH] = "FNMATCH_PUSH",
-    [FNMATCH_POP] = "FNMATCH_POP",
-    [FNMATCH_CONTINUE] = "FNMATCH_CONTINUE",
-    [FNMATCH_STOP] = "FNMATCH_STOP",
-    [FNMATCH_ERROR] = "FNMATCH_ERROR"
-  };
-
-  printf( "[%i:%s]: \n", context->state, state[context->state] );
 }
 
 void fnmatch_context_reset( fnmatch_context_t* context ) {

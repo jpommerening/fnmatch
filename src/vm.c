@@ -209,7 +209,7 @@ fnmatch_state_t fnmatch_vm_rewind( fnmatch_context_t *context ) {
   return FNMATCH_CONTINUE;
 }
 
-#include <stdio.h>
+/*#include <stdio.h>*/
 
 fnmatch_state_t fnmatch_vm_op( fnmatch_context_t *context ) {
   size_t oplen = FNMATCHCTX_OPLEN(context);
@@ -217,7 +217,7 @@ fnmatch_state_t fnmatch_vm_op( fnmatch_context_t *context ) {
   char*  str   = FNMATCHCTX_STR(context);
   
   context->opcode = FNMATCHCTX_OPCODE(context);
-  printf( "OPCODE %i ON %s\n", context->opcode, str );
+  /*printf( "OPCODE %i ON %s\n", context->opcode, str );*/
   switch( context->opcode ) {
     case FNMATCH_OP_FIXED: return fnmatch__vm_fixed( context, str, oplen, oparg );
     case FNMATCH_OP_CHARS: return fnmatch__vm_chars( context, str, oplen, oparg );

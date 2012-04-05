@@ -1,2 +1,7 @@
 *.o
 *.a
+
+test/gen-tests.c
+test/gen-benchmarks.c
+test/run-tests
+test/run-benchmarks

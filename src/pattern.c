@@ -40,7 +40,7 @@ fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* s
   fnmatch_context_init( &context, pattern );
   fnmatch_context_push( &context, str );
   do {
-    fnmatch_context_debug( &context );
+    /*fnmatch_context_debug( &context );*/
     state = fnmatch_context_match( &context );
     switch( state ) {
       case FNMATCH_PUSH:
@@ -50,6 +50,7 @@ fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* s
         fnmatch_context_pop( &context );
         break;
       case FNMATCH_ERROR:
+        fnmatch_context_destroy( &context );
         return FNMATCH_ERROR;
       default:
         break;

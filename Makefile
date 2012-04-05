@@ -35,8 +35,17 @@ else
 include config-unix.mk
 endif
 
+TESTS = test/test-*.c
+BENCHMARKS = test/benchmark-*.c
+
 all: fnmatch.a
 
+test/gen-tests.c: test/gen-tests.sh $(TESTS)
+	test/gen-tests.sh $(TESTS) > test/gen-tests.c
+
+test/run-tests$(E): test/*.h test/run-tests.c test/gen-tests.c $(TESTS) fnmatch.a
+	$(CC) $(CPPFLAGS) -o test/run-tests test/run-tests.c test/gen-tests.c \
+	  $(TESTS) fnmatch.a
 
 .PHONY: clean clean-platform distclean distclean-platform test bench
 
