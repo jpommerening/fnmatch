@@ -19,14 +19,14 @@ TEST( test_context ) {
   ASSERTSTREQ( "xxx/", popstr, "%s", popstr );
   ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );
   fnmatch_context_push( &context, "test/" );
-  
-  /* The "**" op should return matches for every separator it passes */
-  
+    
   ASSERTEQ( FNMATCH_MATCH, fnmatch_context_match( &context ) ); /* "test/" */
   ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );
   fnmatch_context_push( &context, "foo/" );
+  ASSERTEQ( FNMATCH_MATCH, fnmatch_context_match( &context ) ); /* "foo/" */
   ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );
   fnmatch_context_push( &context, "bar/" );
+  ASSERTEQ( FNMATCH_MATCH, fnmatch_context_match( &context ) ); /* "bar/" */
   ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );
   fnmatch_context_push( &context, "baz.c" );
   ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );

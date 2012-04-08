@@ -25,6 +25,7 @@ void fnmatch_context_destroy( fnmatch_context_t* context ) {
 fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
   assert( context );
 
+
   switch( context->state ) {
     case FNMATCH_MATCH:
       if( context->opcode == FNMATCH_OP_END ) {
@@ -32,8 +33,10 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
         context->state = FNMATCH_POP;
       } else if( context->opcode == FNMATCH_OP_SEP ) {
         context->state = fnmatch_vm_next( context );
-      } else {
+      } else if( context->opcode == FNMATCH_OP_DEEP ) {
         context->state = fnmatch_vm_next( context );
+      } else {
+        context->state = FNMATCH_ERROR; /*fnmatch_vm_next( context );*/
       }
       break;
     case FNMATCH_NOMATCH:
@@ -56,16 +59,21 @@ fnmatch_context_match_continue:
     case FNMATCH_ERROR:
       break;
   }
+  
   /* clean this up */
-  if( FNMATCH_MATCH == context->state &&
-      FNMATCH_OP_END != context->opcode &&
-      FNMATCH_OP_SEP != context->opcode ) {
-    context->state = fnmatch_vm_next( context );
-  }
-  if( FNMATCH_NOMATCH  == context->state &&
-      FNMATCH_CONTINUE == fnmatch_vm_retry( context ) ) {
+  if( FNMATCH_MATCH == context->state ) {
+    if( FNMATCH_OP_DEEP == context->opcode &&
+        FNMATCH_SEP == context->buffer[context->offset] ) {
+      /* return match */
+    } else if( FNMATCH_OP_END != context->opcode &&
+               FNMATCH_OP_SEP != context->opcode ) {
+      context->state = fnmatch_vm_next( context );
+    }
+  } else if( FNMATCH_NOMATCH  == context->state &&
+             FNMATCH_CONTINUE == fnmatch_vm_retry( context ) ) {
     context->state = FNMATCH_CONTINUE;
   }
+
   /* Yeah I know; but this time it's fine. Trust me. */
   if( context->state == FNMATCH_CONTINUE )
     goto fnmatch_context_match_continue;
