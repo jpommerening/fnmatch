@@ -19,6 +19,8 @@ typedef enum {
 typedef struct test_s test_t;
 typedef struct test_suite_s test_suite_t;
 typedef struct test_context_s test_context_t;
+
+typedef void (*test_any_cb)();
 typedef void (*test_void_cb)( test_context_t* context );
 typedef void (*test_data_cb)( test_context_t* context, const void* );
 
@@ -26,6 +28,7 @@ typedef void (*test_data_cb)( test_context_t* context, const void* );
 TEST_EXTERN const test_t* tests[];
 
 typedef union {
+  test_any_cb  any_cb;
   test_void_cb void_cb;
   test_data_cb data_cb;
 } test_cb;
@@ -53,46 +56,65 @@ struct test_context_s {
 };
 
 #define TEST_UID(name) test__ ## name
-
-#define TEST_DATA_SIGN(name, arg) \
-  void name(test_context_t* __ctx, arg)
-#define TEST_VOID_SIGN(name) \
-  void name(test_context_t* __ctx)
 #define TEST_STRUCT(name) \
   const test_t TEST_UID(name)
 
-#define TEST_DATA(name, data, arg) \
-  TEST_DATA_SIGN(name, arg); \
-  TEST_STRUCT(name) = { \
-    #name, { .data_cb = (test_data_cb) &name }, \
-    (void*) &(data[1]) - (void*) &(data[0]), \
-    sizeof(data)/sizeof(data[0]), \
-    &(data[0]) \
-  }; \
-  TEST_DATA_SIGN(name, arg)
+/* Crazy preprocessor macros ahead:
+ *   We trick the preprocessor into telling us if TEST() was supplied
+ *   with additional parameters.
+ *   Depending on that, we place different stuff into the struct.
+ */
 
-#define TEST_VOID(name) \
-  TEST_VOID_SIGN(name); \
+/* If additional parameters are given in `...' expand them
+ * using the function-like macro `a', otherwise insert `b'. */
+#define IF_ARGS(a,b,...) _IF_ARGS(__VA_ARGS__) ? b : a(__VA_ARGS__ ((void*)0)) /* dummy arg*/
+#define _IF_ARGS(...)    (sizeof(#__VA_ARGS__) == 1)
+
+/* Initializers for test structs with test data. */
+#define _TEST_DATASTEP(data, ...) \
+  sizeof(data[0])
+#define _TEST_DATALENGTH(data, ...) \
+  sizeof(data)/sizeof(data[0])
+#define _TEST_DATAPTR(data, ...) \
+  &(data[0])
+
+/* Generate the signature of a test function.
+ * Skip the first variadic parameter and use the rest inside the declaration. */
+#define TEST_SIGN(name,...) \
+  _TEST_SIGN(name,__VA_ARGS__)
+#define _TEST_SIGN(name,d,...) \
+  static void name( test_context_t* __ctx, ## __VA_ARGS__ )
+
+/**
+ * Declare test functions with this macro.
+ * @param name the name of the function to declare.
+ * @param [data] an array containing test data to drive the test.
+ * @param [arg] the parameter that is used by the function to accept data.
+ */
+#define TEST(name,...) \
+  TEST_SIGN(name,## __VA_ARGS__); \
   TEST_STRUCT(name) = { \
-    #name, { .void_cb = (test_void_cb) &name }, \
-    0, 0, NULL \
+    #name, &name, \
+    IF_ARGS(_TEST_DATASTEP,0,## __VA_ARGS__), \
+    IF_ARGS(_TEST_DATALENGTH,0,## __VA_ARGS__), \
+    IF_ARGS(_TEST_DATAPTR,NULL,## __VA_ARGS__), \
   }; \
-  TEST_VOID_SIGN(name)
+  TEST_SIGN(name,## __VA_ARGS__)
 
 TEST_EXTERN void test_message( test_context_t* context, const char* file, int line, const char* fmt, ... );
 TEST_EXTERN void test_status( test_context_t* context, test_result_t result );
 TEST_EXTERN test_result_t test_run( const test_t* test );
 TEST_EXTERN test_result_t test_suite_run( const test_suite_t* suite );
 
-#define TEST_MSG(...) test_message(__ctx, __FILE__, __LINE__, __VA_ARGS__)
-#define TEST_STATUS(x) test_status(__ctx,x)
+#define MSG(...) test_message(__ctx, __FILE__, __LINE__, "" __VA_ARGS__)
+#define RESULT(x) test_status(__ctx,x)
 
-#define FAIL(...) do { TEST_MSG(__VA_ARGS__); TEST_STATUS(TEST_FAIL); return; } while( 0 )
-#define WARN(...) do { TEST_MSG(__VA_ARGS__); TEST_STATUS(TEST_WARN); } while( 0 )
-#define ERROR(...) do { TEST_MSG(__VA_ARGS__); TEST_STATUS(TEST_ERROR); abort(); } while( 0 )
+#define FAIL(...) do { MSG(__VA_ARGS__); RESULT(TEST_FAIL); return; } while( 0 )
+#define WARN(...) do { MSG(__VA_ARGS__); RESULT(TEST_WARN); } while( 0 )
+#define ERROR(...) do { MSG(__VA_ARGS__); RESULT(TEST_ERROR); abort(); } while( 0 )
 
 #define ASSERTBASE(x,...) do if( !(x) ) { FAIL(__VA_ARGS__); } while( 0 )
-#define ASSERT(x,...) ASSERTBASE(x,"`" #x "' is not true!\n", ## __VA_ARGS__)
+#define ASSERT(x,...) ASSERTBASE(x,"`" #x "' is not true!\n" __VA_ARGS__)
 #define ASSERTEQ(a,b,...) ASSERTBASE((a) == (b),"`" #a "' does not equal `" #b "'!\n" __VA_ARGS__)
 #define ASSERTLT(a,b,...) ASSERTBASE((a) < (b),"`" #a "' is not less than `" #b "'!\n" __VA_ARGS__)
 #define ASSERTGT(a,b,...) ASSERTBASE((a) > (b),"`" #a "' is not greater than`" #b "'!\n" __VA_ARGS__)

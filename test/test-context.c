@@ -1,5 +1,6 @@
 #include "fnmatch.h"
 #include "test.h"
 
-TEST_VOID(test_context) {
+TEST( test_context ) {
+  WARN("This test is not yet implemented.\n");
 }

@@ -8,7 +8,7 @@ typedef struct test_fnmatch_s {
   int flags;
 } test_fnmatch_t;
 
-static const test_fnmatch_t data[] = {
+static const test_fnmatch_t _data[] = {
 
   /* fixed string */
   { 0, "test", "test", FNM_PATHNAME },
@@ -45,7 +45,7 @@ static const test_fnmatch_t data[] = {
 
 };
 
-TEST_DATA(test_fnmatch, data, const test_fnmatch_t* data ) {
+TEST(test_fnmatch, _data, const test_fnmatch_t* data) {
   if( data->result == 0 ) {
     ASSERTEQ( data->result, fnmatch( data->pattern, data->string, data->flags ),
               "`%s' didn't match `%s' (with flags 0x%2x) but should.\n",
@@ -56,4 +56,3 @@ TEST_DATA(test_fnmatch, data, const test_fnmatch_t* data ) {
               data->pattern, data->string, data->flags );
   }
 }
-

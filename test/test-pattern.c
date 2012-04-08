@@ -7,7 +7,7 @@ typedef struct test_pattern_s {
   const char* nomatchstr;
 } test_pattern_t;
 
-static const test_pattern_t data[] = {
+static const test_pattern_t _data[] = {
 
   /* fixed string */
   { "test", "test", "test " },
@@ -41,11 +41,13 @@ static const test_pattern_t data[] = {
   { "t\\/st", "t/st", "t\\/st" },
 };
 
-TEST_DATA( test_pattern, data, test_pattern_t* data ) {
+TEST( test_pattern, _data, const test_pattern_t* data ) {
   fnmatch_state_t state;
   fnmatch_pattern_t pattern;
   fnmatch_pattern_init( &pattern );
-
+  
+/*MSG("%s, %s, %s", data->expr, data->matchstr, data->nomatchstr);*/
+  
   state = fnmatch_pattern_compile( &pattern, data->expr );
   ASSERTEQ( state, FNMATCH_CONTINUE, "Could not compile pattern `%s'.\n", data->expr );
 

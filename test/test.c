@@ -8,16 +8,19 @@ void test_status( test_context_t* context, test_result_t result ) {
 
 void test_message( test_context_t* context, const char* file, int line, const char* fmt, ... ) {
   const test_t* test = context->test;
-
+  FILE* fp = stdout;
+  
+  if( fmt[0] == '\0' ) return;
+  
   if( test ) {
-    fprintf( stderr, "%s:%d: %s: ", file, line, test->name );
+    fprintf( fp, "%s:%d: %s: ", file, line, test->name );
   } else {
-    fprintf( stderr, "%s:%d: ", file, line );
+    fprintf( fp, "%s:%d: ", file, line );
   }
   
   va_list vargs;
   va_start(vargs, fmt);
-  vfprintf( stderr, fmt, vargs );
+  vfprintf( fp, fmt, vargs );
   va_end(vargs);
 }
 
@@ -82,6 +85,7 @@ static void test__run_data( test_context_t* context ) {
     test__start( context );
     (test->callback.data_cb)( context, context->data );
     test__finish( context );
+    context->data = NULL;
   }
 }
 
@@ -131,7 +135,11 @@ test_result_t test_suite_run( const test_suite_t* suite ) {
   if( context.count[TEST_FAIL] || context.count[TEST_SKIP] ) {
     context.result = TEST_FAIL;
   } else if( context.count[TEST_WARN] ) {
+    printf( "WARNINGS: %i\n", context.count[TEST_WARN] );
     context.result = TEST_WARN;
+  } else if( context.count[TEST_ERROR] ) {
+    printf( "ERRORS: %i\n", context.count[TEST_ERROR] );
+    context.result = TEST_ERROR;
   } else {
     context.result = TEST_PASS;
   }
