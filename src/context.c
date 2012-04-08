@@ -117,8 +117,6 @@ void fnmatch_context_push( fnmatch_context_t* context, const char* str ) {
 }
 
 const char * fnmatch_context_pop( fnmatch_context_t* context ) {
-  size_t offset = context->offset;
-
   assert( context );
 
   if( context->state != FNMATCH_POP ) {
@@ -128,13 +126,7 @@ const char * fnmatch_context_pop( fnmatch_context_t* context ) {
 
   fnmatch_vm_rewind( context );
 
-           /* what was the meaning of this? */
-  if( 1 || (context->offset < offset) ) {
-    context->state = FNMATCH_CONTINUE;
-    return &(context->buffer[offset]);
-  } else {
-    context->state = FNMATCH_STOP;
-    return NULL;
-  }
+  context->state = FNMATCH_CONTINUE;
+  return &(context->buffer[context->offset]);
 }
 
