@@ -48,11 +48,11 @@ static const test_fnmatch_t _data[] = {
 TEST(test_fnmatch, _data, const test_fnmatch_t* data) {
   if( data->result == 0 ) {
     ASSERTEQ( data->result, fnmatch( data->pattern, data->string, data->flags ),
-              "`%s' didn't match `%s' (with flags 0x%2x) but should.\n",
+              "`%s' didn't match `%s' (with flags 0x%02x) but should.\n",
               data->pattern, data->string, data->flags );
   } else {
     ASSERTEQ( data->result, fnmatch( data->pattern, data->string, data->flags ),
-              "`%s' matched `%s' (with flags 0x%2x) but shouldn't.\n",
+              "`%s' matched `%s' (with flags 0x%02x) but shouldn't.\n",
               data->pattern, data->string, data->flags );
   }
 }

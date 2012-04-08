@@ -37,11 +37,7 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
       }
       break;
     case FNMATCH_NOMATCH:
-      if( fnmatch_vm_retry( context ) == FNMATCH_CONTINUE ) {
-        context->state = fnmatch_vm_op( context );
-      } else {
-        context->state = FNMATCH_POP;
-      }
+      context->state = FNMATCH_POP;
       break;
     case FNMATCH_PUSH:
     case FNMATCH_POP:
@@ -49,11 +45,8 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
       break;
     case FNMATCH_CONTINUE:
 fnmatch_context_match_continue:
-      /*if( context->offset == context->buflen ) {
+      if( context->offset >= context->buflen || context->buflen == 0 ) {
         context->state = FNMATCH_PUSH;
-      } else*/
-      if( context->offset > context->buflen || context->buflen == 0 ) {
-        context->state = FNMATCH_STOP;
       } else {
         context->state = fnmatch_vm_op( context );
       }
@@ -62,6 +55,16 @@ fnmatch_context_match_continue:
       break;
     case FNMATCH_ERROR:
       break;
+  }
+  /* clean this up */
+  if( FNMATCH_MATCH == context->state &&
+      FNMATCH_OP_END != context->opcode &&
+      FNMATCH_OP_SEP != context->opcode ) {
+    context->state = fnmatch_vm_next( context );
+  }
+  if( FNMATCH_NOMATCH  == context->state &&
+      FNMATCH_CONTINUE == fnmatch_vm_retry( context ) ) {
+    context->state = FNMATCH_CONTINUE;
   }
   /* Yeah I know; but this time it's fine. Trust me. */
   if( context->state == FNMATCH_CONTINUE )
@@ -93,9 +96,13 @@ void fnmatch_context_push( fnmatch_context_t* context, const char* str ) {
   length = str ? strlen( str ) : 0;
   if( length > 0 ) {
     context->state = FNMATCH_CONTINUE;
-    FNMATCH_GROW( context->buffer, context->buflen+length, &(context->alloc) );
-    memcpy( &(context->buffer[context->buflen]), str, length );
+    FNMATCH_GROW( context->buffer, context->buflen+length+1, &(context->alloc) );
+    memcpy( &(context->buffer[context->buflen]), str, length+1 );
     context->buflen += length;
+  } else if( context->buffer[context->buflen] == '\0' ) {
+    /* expose the implicit '\0' to the matcher */
+    context->buflen += 1;
+    context->state = FNMATCH_CONTINUE;
   } else {
     context->state = FNMATCH_STOP;
   }
@@ -113,7 +120,8 @@ const char * fnmatch_context_pop( fnmatch_context_t* context ) {
 
   fnmatch_vm_rewind( context );
 
-  if( context->offset < offset ) {
+           /* what was the meaning of this? */
+  if( 1 || (context->offset < offset) ) {
     context->state = FNMATCH_CONTINUE;
     return &(context->buffer[offset]);
   } else {
