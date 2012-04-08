@@ -45,17 +45,15 @@ static const test_fnmatch_t data[] = {
 
 };
 
-test_t test_fnmatch( const test_fnmatch_t* data ) {
+TEST_DATA(test_fnmatch, data, const test_fnmatch_t* data ) {
   if( data->result == 0 ) {
-    ASSERT_EQUALS( data->result, fnmatch( data->pattern, data->string, data->flags ),
-                   "`%s' didn't match `%s' (with flags 0x%2x) but should.\n",
-                   data->pattern, data->string, data->flags );
+    ASSERTEQ( data->result, fnmatch( data->pattern, data->string, data->flags ),
+              "`%s' didn't match `%s' (with flags 0x%2x) but should.\n",
+              data->pattern, data->string, data->flags );
   } else {
-    ASSERT_EQUALS( data->result, fnmatch( data->pattern, data->string, data->flags ),
-                   "`%s' matched `%s' (with flags 0x%2x) but shouldn't.\n",
-                   data->pattern, data->string, data->flags );
+    ASSERTEQ( data->result, fnmatch( data->pattern, data->string, data->flags ),
+              "`%s' matched `%s' (with flags 0x%2x) but shouldn't.\n",
+              data->pattern, data->string, data->flags );
   }
-  PASS;
 }
 
-TEST_DATA(test_fnmatch,data);

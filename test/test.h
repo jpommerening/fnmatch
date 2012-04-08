@@ -1,66 +1,107 @@
 #ifndef _TEST_H_
 #define _TEST_H_
 
-#include <unistd.h>
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define TEST_EXTERN extern
 
 typedef enum {
   TEST_PASS,
   TEST_FAIL,
   TEST_SKIP,
   TEST_WARN,
-  TEST_ERROR
-} test_t;
+  TEST_ERROR,
+  TEST_RESULT_MAX
+} test_result_t;
 
-#define ASSERT(x,m,...) do if( !(x) ) { fprintf( stderr, "\n%s:%i: Assertion failed:\n  " #x "\n" m, __FILE__, __LINE__, ## __VA_ARGS__ ); FAIL; } while( 0 )
-#define ASSERT_EQUALS(a,b,...) ASSERT( (a) == (b), __VA_ARGS__ )
-#define PASS return TEST_PASS
-#define FAIL return TEST_FAIL
+typedef struct test_s test_t;
+typedef struct test_suite_s test_suite_t;
+typedef struct test_context_s test_context_t;
+typedef void (*test_void_cb)( test_context_t* context );
+typedef void (*test_data_cb)( test_context_t* context, const void* );
 
-typedef test_t (*test_void_cb)( void );
-typedef test_t (*test_data_cb)( const void* );
+/* from gen-tests.sh -> gen-tests.c */
+TEST_EXTERN const test_t* tests[];
 
 typedef union {
   test_void_cb void_cb;
   test_data_cb data_cb;
 } test_cb;
 
-typedef struct test_item_s {
-  test_cb callback;
+struct test_s {
   const char* name;
-  size_t step;
-  size_t length;
+  test_cb callback;
+  int datastep;
+  int datalength;
   const void* data;
-} test_item_t;
+};
 
-typedef struct test_statistics_s {
+struct test_suite_s {
+  const char* name;
+  const test_t** tests;
+};
+
+struct test_context_s {
+  const test_suite_t* suite;
+  const test_t* test;
+  const void* data;
+  test_result_t result;
   int total;
-  int pass;
-  int fail;
-  int skip;
-  int warn;
-  int error;
-} test_statistics_t;
+  int count[TEST_RESULT_MAX];
+};
 
-#define TEST_UID(function) __ ## function
+#define TEST_UID(name) test__ ## name
 
-#define TEST_VOID_NAME(name,function) const test_item_t TEST_UID(function) = { \
-  { .void_cb = (test_void_cb) function }, \
-  name, \
-  0, \
-  0, \
-  NULL \
+#define TEST_DATA_SIGN(name, arg) \
+  void name(test_context_t* __ctx, arg)
+#define TEST_VOID_SIGN(name) \
+  void name(test_context_t* __ctx)
+#define TEST_STRUCT(name) \
+  const test_t TEST_UID(name)
+
+#define TEST_DATA(name, data, arg) \
+  TEST_DATA_SIGN(name, arg); \
+  TEST_STRUCT(name) = { \
+    #name, { .data_cb = (test_data_cb) &name }, \
+    (void*) &(data[1]) - (void*) &(data[0]), \
+    sizeof(data)/sizeof(data[0]), \
+    &(data[0]) \
+  }; \
+  TEST_DATA_SIGN(name, arg)
+
+#define TEST_VOID(name) \
+  TEST_VOID_SIGN(name); \
+  TEST_STRUCT(name) = { \
+    #name, { .void_cb = (test_void_cb) &name }, \
+    0, 0, NULL \
+  }; \
+  TEST_VOID_SIGN(name)
+
+TEST_EXTERN void test_message( test_context_t* context, const char* file, int line, const char* fmt, ... );
+TEST_EXTERN void test_status( test_context_t* context, test_result_t result );
+TEST_EXTERN test_result_t test_run( const test_t* test );
+TEST_EXTERN test_result_t test_suite_run( const test_suite_t* suite );
+
+#define TEST_MSG(...) test_message(__ctx, __FILE__, __LINE__, __VA_ARGS__)
+#define TEST_STATUS(x) test_status(__ctx,x)
+
+#define FAIL(...) do { TEST_MSG(__VA_ARGS__); TEST_STATUS(TEST_FAIL); return; } while( 0 )
+#define WARN(...) do { TEST_MSG(__VA_ARGS__); TEST_STATUS(TEST_WARN); } while( 0 )
+#define ERROR(...) do { TEST_MSG(__VA_ARGS__); TEST_STATUS(TEST_ERROR); abort(); } while( 0 )
+
+#define ASSERTBASE(x,...) do if( !(x) ) { FAIL(__VA_ARGS__); } while( 0 )
+#define ASSERT(x,...) ASSERTBASE(x,"`" #x "' is not true!\n", ## __VA_ARGS__)
+#define ASSERTEQ(a,b,...) ASSERTBASE((a) == (b),"`" #a "' does not equal `" #b "'!\n" __VA_ARGS__)
+#define ASSERTLT(a,b,...) ASSERTBASE((a) < (b),"`" #a "' is not less than `" #b "'!\n" __VA_ARGS__)
+#define ASSERTGT(a,b,...) ASSERTBASE((a) > (b),"`" #a "' is not greater than`" #b "'!\n" __VA_ARGS__)
+#define ASSERTSTREQ(a,b,...) ASSERTBASE(strcmp(a,b) == 0,"Strings `" #a "' and `" #b "' are not equal!\n" __VA_ARGS__)
+#define ASSERTSTRLT(a,b,...) ASSERTBASE(strcmp(a,b) < 0,"String `" #a "' is not `less than' string `" #b "'!\n" __VA_ARGS__)
+#define ASSERTSTRGT(a,b,...) ASSERTBASE(strcmp(a,b) > 0,"String `" #a "' is not `greater than' string `" #b "'!\n" __VA_ARGS__)
+
+#ifdef __cplusplus
 }
-
-#define TEST_DATA_NAME(name,function,data) const test_item_t TEST_UID(function) = { \
-  { .data_cb = (test_data_cb) function }, \
-  name, \
-  (void*) &(data[1]) - (void*) &(data[0]), \
-  sizeof(data)/sizeof(data[0]), \
-  (void*) &(data[0]) \
-}
-
-#define TEST_VOID(function) TEST_VOID_NAME(#function,function)
-#define TEST_DATA(function,data) TEST_DATA_NAME(#function,function,data)
+#endif
 
 #endif

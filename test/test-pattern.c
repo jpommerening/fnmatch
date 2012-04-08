@@ -41,21 +41,17 @@ static const test_pattern_t data[] = {
   { "t\\/st", "t/st", "t\\/st" },
 };
 
-test_t test_pattern( test_pattern_t* data ) {
+TEST_DATA( test_pattern, data, test_pattern_t* data ) {
   fnmatch_state_t state;
   fnmatch_pattern_t pattern;
   fnmatch_pattern_init( &pattern );
 
   state = fnmatch_pattern_compile( &pattern, data->expr );
-  ASSERT_EQUALS( state, FNMATCH_CONTINUE, "Could not compile pattern `%s'.\n", data->expr );
+  ASSERTEQ( state, FNMATCH_CONTINUE, "Could not compile pattern `%s'.\n", data->expr );
 
   state = fnmatch_pattern_match( &pattern, data->matchstr );
-  ASSERT_EQUALS( state, FNMATCH_MATCH, "`%s' did not match ´%s' but should.\n", data->expr, data->matchstr );
+  ASSERTEQ( state, FNMATCH_MATCH, "`%s' did not match %s' but should.\n", data->expr, data->matchstr );
 
   state = fnmatch_pattern_match( &pattern, data->nomatchstr );
-  ASSERT_EQUALS( state, FNMATCH_NOMATCH, "`%s' did match `%s' but shouldn't.\n", data->expr, data->nomatchstr );
-
-  PASS;
+  ASSERTEQ( state, FNMATCH_NOMATCH, "`%s' did match `%s' but shouldn't.\n", data->expr, data->nomatchstr );
 }
-
-TEST_DATA(test_pattern,data);
