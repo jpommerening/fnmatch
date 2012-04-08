@@ -43,28 +43,16 @@ static void test__start( test_context_t* context ) {
 }
 
 static void test__finish( test_context_t* context ) {
+  static const char* str[TEST_RESULT_MAX] = {
+    "PASS",
+    "FAIL",
+    "SKIP",
+    "WARN",
+    "ERROR"
+  };
   context->total++;
   context->count[context->result]++;
-  switch( context->result ) {
-    case TEST_PASS:
-      printf( " PASS\n" );
-      break;
-    case TEST_FAIL:
-      printf( " FAIL\n" );
-      break;
-    case TEST_SKIP:
-      printf( " SKIP\n" );
-      break;
-    case TEST_WARN:
-      printf( " WARN\n" );
-      break;
-    case TEST_ERROR:
-      printf( " ERROR\n" );
-      break;
-    default:
-      printf( " ERROR (%d)\n", context->result );
-      break;
-  }
+  printf( " %s\n", str[context->result] );
 }
 
 static void test__run_void( test_context_t* context ) {
