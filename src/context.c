@@ -25,7 +25,6 @@ void fnmatch_context_destroy( fnmatch_context_t* context ) {
 fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
   assert( context );
 
-
   switch( context->state ) {
     case FNMATCH_MATCH:
       if( context->opcode == FNMATCH_OP_END ) {

@@ -194,17 +194,31 @@ fnmatch_state_t fnmatch_vm_rewind( fnmatch_context_t *context ) {
   if( fnmatch_vm_retry( context ) == FNMATCH_CONTINUE )
     return FNMATCH_CONTINUE;
 
-  /* throw away buffer from end to last separator
-     rewind program until last separator */
+  /* throw away buffer from end to last separator */
+
+  /* clean me up */
+  
+  if( *FNMATCHCTX_STR(context) == '\0' )
+    context->offset--;
+  if( *FNMATCHCTX_STR(context) == FNMATCH_SEP )
+    context->offset--;
+  
+  while( (context->offset) > 0 ) {
+    if( *FNMATCHCTX_STR(context) == FNMATCH_SEP ) {
+      context->offset++;
+      break;
+    }
+    context->offset--;
+  }
+  
+  /* rewind the program accordingly */
 
   while( fnmatch_vm_prev( context ) == FNMATCH_CONTINUE ) {
+    if( FNMATCHCTX_OPCODE(context) == FNMATCH_OP_DEEP &&
+        context->mark_offset < context->offset ) break;
     if( FNMATCHCTX_OPCODE(context) == FNMATCH_OP_SEP ) break;
   }
   
-  while( (context->offset) > 0 ) {
-    context->offset--;
-    if( *FNMATCHCTX_STR(context) == FNMATCH_SEP ) break;
-  }
   context->buflen = context->offset;
   return FNMATCH_CONTINUE;
 }
