@@ -1,6 +1,16 @@
 #include "test.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <sys/time.h>
+
+struct test_context_s {
+  const test_suite_t* suite;
+  const test_t* test;
+  const void* data;
+  test_result_t result;
+  struct timeval start, finish;
+  int total, count[TEST_RESULT_MAX];
+};
 
 void test_status( test_context_t* context, test_result_t result ) {
   context->result = (result > context->result) ? result : context->result;
@@ -40,6 +50,8 @@ static void test__start( test_context_t* context ) {
     
     printf( ":" );
   }
+  
+  gettimeofday( &(context->start), NULL );
 }
 
 static void test__finish( test_context_t* context ) {
@@ -50,9 +62,16 @@ static void test__finish( test_context_t* context ) {
     "WARN",
     "ERROR"
   };
+  double diff;
+  
+  gettimeofday( &(context->finish), NULL );
+  
+  diff = ((context->finish.tv_sec - context->start.tv_sec) * 1000)
+       + ((context->finish.tv_usec - context->start.tv_usec) * 0.001);
+  
   context->total++;
   context->count[context->result]++;
-  printf( " %s\n", str[context->result] );
+  printf( " %s (%.3lfms)\n", str[context->result], diff );
 }
 
 static void test__run_void( test_context_t* context ) {

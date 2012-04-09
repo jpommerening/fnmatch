@@ -46,15 +46,6 @@ struct test_suite_s {
   const test_t** tests;
 };
 
-struct test_context_s {
-  const test_suite_t* suite;
-  const test_t* test;
-  const void* data;
-  test_result_t result;
-  int total;
-  int count[TEST_RESULT_MAX];
-};
-
 #define TEST_UID(name) test__ ## name
 #define TEST_STRUCT(name) \
   const test_t TEST_UID(name)
