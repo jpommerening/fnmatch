@@ -15,12 +15,12 @@
 		5958B60E1532FACA00AC8652 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 5958B5F3152E1EA800AC8652 /* test.c */; };
 		5958B6101532FAE100AC8652 /* gen-tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 5958B60F1532FAE100AC8652 /* gen-tests.c */; };
 		5958B6141532FB0400AC8652 /* fnmatch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 597B155F1519190A00229222 /* fnmatch.a */; };
-		597B159815191AFE00229222 /* fnmatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B159715191AFE00229222 /* fnmatch.h */; };
+		597B159815191AFE00229222 /* fnmatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B159715191AFE00229222 /* fnmatch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		597B159F1519384100229222 /* pattern.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B159E1519384100229222 /* pattern.c */; };
 		597B15A11519385200229222 /* context.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A01519385200229222 /* context.c */; };
 		597B15A31519387D00229222 /* scanner.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A21519387D00229222 /* scanner.c */; };
 		597B15A515193E0400229222 /* vm.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A415193E0400229222 /* vm.c */; };
-		597B15A7151A61E300229222 /* internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B15A6151A61E300229222 /* internal.h */; };
+		597B15A7151A61E300229222 /* internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B15A6151A61E300229222 /* internal.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		597B15AD152893FF00229222 /* compiler.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15AC152893FF00229222 /* compiler.c */; };
 		597B15AF1528A0E800229222 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15AE1528A0E800229222 /* util.c */; };
 		598AB10F152B61D300CC6DEF /* posix.c in Sources */ = {isa = PBXBuildFile; fileRef = 598AB10E152B61D300CC6DEF /* posix.c */; };
@@ -35,18 +35,6 @@
 			remoteInfo = fnmatch;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		5958B5FE1532FA9C00AC8652 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		5958B5ED152E1EA800AC8652 /* gen-tests.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "gen-tests.sh"; sourceTree = "<group>"; };
@@ -179,7 +167,6 @@
 				5958B6111532FAF800AC8652 /* ShellScript */,
 				5958B5FC1532FA9C00AC8652 /* Sources */,
 				5958B5FD1532FA9C00AC8652 /* Frameworks */,
-				5958B5FE1532FA9C00AC8652 /* CopyFiles */,
 			);
 			buildRules = (
 			);
