@@ -20,7 +20,7 @@
 		597B15A11519385200229222 /* context.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A01519385200229222 /* context.c */; };
 		597B15A31519387D00229222 /* scanner.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A21519387D00229222 /* scanner.c */; };
 		597B15A515193E0400229222 /* vm.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A415193E0400229222 /* vm.c */; };
-		597B15A7151A61E300229222 /* internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B15A6151A61E300229222 /* internal.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		597B15A7151A61E300229222 /* internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B15A6151A61E300229222 /* internal.h */; settings = {ATTRIBUTES = (); }; };
 		597B15AD152893FF00229222 /* compiler.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15AC152893FF00229222 /* compiler.c */; };
 		597B15AF1528A0E800229222 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15AE1528A0E800229222 /* util.c */; };
 		598AB10F152B61D300CC6DEF /* posix.c in Sources */ = {isa = PBXBuildFile; fileRef = 598AB10E152B61D300CC6DEF /* posix.c */; };
@@ -37,6 +37,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		593A9B6E153335CE0029A38D /* config-mingw.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; name = "config-mingw.mk"; path = "../glob/config-mingw.mk"; sourceTree = "<group>"; };
+		593A9B70153335DA0029A38D /* config-unix.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; name = "config-unix.mk"; path = "../glob/config-unix.mk"; sourceTree = "<group>"; };
+		593A9B71153335DA0029A38D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../glob/LICENSE; sourceTree = "<group>"; };
+		593A9B72153335DA0029A38D /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; name = Makefile; path = ../glob/Makefile; sourceTree = "<group>"; };
 		5958B5ED152E1EA800AC8652 /* gen-tests.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "gen-tests.sh"; sourceTree = "<group>"; };
 		5958B5EF152E1EA800AC8652 /* run-tests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "run-tests.c"; sourceTree = "<group>"; };
 		5958B5F0152E1EA800AC8652 /* test-context.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-context.c"; sourceTree = "<group>"; };
@@ -47,7 +51,6 @@
 		5958B6001532FA9C00AC8652 /* fnmatch-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "fnmatch-test"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5958B60F1532FAE100AC8652 /* gen-tests.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "gen-tests.c"; sourceTree = "<group>"; };
 		597B155F1519190A00229222 /* fnmatch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = fnmatch.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		597B158C15191A0B00229222 /* libsproc-mbstring.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsproc-mbstring.a"; path = "../mbstring/build/Release/libsproc-mbstring.a"; sourceTree = "<group>"; };
 		597B159715191AFE00229222 /* fnmatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fnmatch.h; sourceTree = "<group>"; };
 		597B159E1519384100229222 /* pattern.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pattern.c; sourceTree = "<group>"; };
 		597B15A01519385200229222 /* context.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = context.c; sourceTree = "<group>"; };
@@ -96,10 +99,13 @@
 		597B15541519190A00229222 = {
 			isa = PBXGroup;
 			children = (
+				593A9B71153335DA0029A38D /* LICENSE */,
+				593A9B72153335DA0029A38D /* Makefile */,
+				593A9B6E153335CE0029A38D /* config-mingw.mk */,
+				593A9B70153335DA0029A38D /* config-unix.mk */,
 				597B158F15191A4A00229222 /* include */,
 				597B159015191A4A00229222 /* src */,
 				5958B5EB152E1EA800AC8652 /* test */,
-				597B159115191A5400229222 /* Libraries */,
 				597B15601519190A00229222 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -136,14 +142,6 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		597B159115191A5400229222 /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				597B158C15191A0B00229222 /* libsproc-mbstring.a */,
-			);
-			name = Libraries;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -160,9 +158,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		5958B5FF1532FA9C00AC8652 /* run-tests */ = {
+		5958B5FF1532FA9C00AC8652 /* fnmatch-test */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5958B6071532FA9D00AC8652 /* Build configuration list for PBXNativeTarget "run-tests" */;
+			buildConfigurationList = 5958B6071532FA9D00AC8652 /* Build configuration list for PBXNativeTarget "fnmatch-test" */;
 			buildPhases = (
 				5958B6111532FAF800AC8652 /* ShellScript */,
 				5958B5FC1532FA9C00AC8652 /* Sources */,
@@ -173,7 +171,7 @@
 			dependencies = (
 				5958B6131532FB0000AC8652 /* PBXTargetDependency */,
 			);
-			name = "run-tests";
+			name = "fnmatch-test";
 			productName = "fnmatch-test";
 			productReference = 5958B6001532FA9C00AC8652 /* fnmatch-test */;
 			productType = "com.apple.product-type.tool";
@@ -217,7 +215,7 @@
 			projectRoot = "";
 			targets = (
 				597B155E1519190A00229222 /* fnmatch */,
-				5958B5FF1532FA9C00AC8652 /* run-tests */,
+				5958B5FF1532FA9C00AC8652 /* fnmatch-test */,
 			);
 		};
 /* End PBXProject section */
@@ -235,7 +233,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "$(PROJECT_DIR)/test/gen-tests.sh test/test-*.c";
+			shellScript = "${PROJECT_DIR}/test/gen-tests.sh test/test-*.c";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -312,6 +310,14 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(TARGET_BUILD_DIR)/usr/local/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(TARGET_BUILD_DIR)",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -332,6 +338,14 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(TARGET_BUILD_DIR)/usr/local/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(TARGET_BUILD_DIR)",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
 			};
@@ -356,13 +370,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5958B6071532FA9D00AC8652 /* Build configuration list for PBXNativeTarget "run-tests" */ = {
+		5958B6071532FA9D00AC8652 /* Build configuration list for PBXNativeTarget "fnmatch-test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5958B6081532FA9D00AC8652 /* Debug */,
 				5958B6091532FA9D00AC8652 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		597B15591519190A00229222 /* Build configuration list for PBXProject "fnmatch" */ = {
 			isa = XCConfigurationList;

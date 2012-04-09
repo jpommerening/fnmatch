@@ -51,7 +51,8 @@ TEST( test_context ) {
 
   ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );
   fnmatch_context_push( &context, NULL );
-  ASSERTEQ( FNMATCH_POP, fnmatch_context_match( &context ) ); /* bzzz, it stops here */
+  ASSERTEQ( FNMATCH_POP, fnmatch_context_match( &context ),
+            "Unfortunately, this was expected.\n" ); /* bzzz, it stops here */
   
   fnmatch_context_destroy( &context );
   fnmatch_pattern_destroy( &pattern );
