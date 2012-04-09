@@ -8,8 +8,9 @@ struct test_context_s {
   const test_t* test;
   const void* data;
   test_result_t result;
+  FILE* log;
   struct timeval start, finish;
-  int total, count[TEST_RESULT_MAX];
+  int msg, total, count[TEST_RESULT_MAX];
 };
 
 void test_status( test_context_t* context, test_result_t result ) {
@@ -18,19 +19,23 @@ void test_status( test_context_t* context, test_result_t result ) {
 
 void test_message( test_context_t* context, const char* file, int line, const char* fmt, ... ) {
   const test_t* test = context->test;
-  FILE* fp = stdout;
   
   if( fmt[0] == '\0' ) return;
   
+  if( context->msg == 0 )
+    fprintf( context->log, " ...\n" );
+  
   if( test ) {
-    fprintf( fp, "%s:%d: %s: ", file, line, test->name );
+    fprintf( context->log, "%s:%d: %s: ", file, line, test->name );
   } else {
-    fprintf( fp, "%s:%d: ", file, line );
+    fprintf( context->log, "%s:%d: ", file, line );
   }
+  
+  context->msg++;
   
   va_list vargs;
   va_start(vargs, fmt);
-  vfprintf( fp, fmt, vargs );
+  vfprintf( context->log, fmt, vargs );
   va_end(vargs);
 }
 
@@ -38,17 +43,17 @@ static void test__start( test_context_t* context ) {
   const test_t* test = context->test;
 /*const test_suite_t* suite = context->suite;*/
   const void* data = context->data;
-
+  
   if( test ) {
-    printf( "TEST %s", test->name );
+    fprintf( context->log, "TEST %s", test->name );
     
     if( data ) {
-      printf( " [%d/%d]",
+      fprintf( context->log, " [%d/%d]",
         (int) ((data - test->data) / test->datastep) + 1,
         test->datalength );
     }
     
-    printf( ":" );
+    fprintf( context->log, ":" );
   }
   
   gettimeofday( &(context->start), NULL );
@@ -71,7 +76,12 @@ static void test__finish( test_context_t* context ) {
   
   context->total++;
   context->count[context->result]++;
-  printf( " %s (%.3lfms)\n", str[context->result], diff );
+  if( context->msg == 0 ) {
+    fprintf( context->log, " %s (%.3lfms)\n", str[context->result], diff );
+  } else {
+    context->msg = 0;
+    fprintf( context->log, " ... %s (%.3lfms)\n", str[context->result], diff );
+  }
 }
 
 static void test__run_void( test_context_t* context ) {
@@ -110,7 +120,10 @@ test_result_t test_run( const test_t* test ) {
     NULL,
     test,
     NULL,
-    TEST_PASS
+    TEST_PASS,
+    stdout,
+    { 0 }, { 0 },
+    0
   };
   
   test__run( &context );
@@ -122,7 +135,10 @@ test_result_t test_suite_run( const test_suite_t* suite ) {
     suite,
     NULL,
     NULL,
-    TEST_PASS
+    TEST_PASS,
+    stdout,
+    { 0 }, { 0 },
+    0
   };
   int i;
   
@@ -132,7 +148,7 @@ test_result_t test_suite_run( const test_suite_t* suite ) {
     test__run( &context );
   }
   
-  printf( "RESULTS: %i/%i passed, %i failed, %i skipped\n",
+  fprintf( context.log, "RESULTS: %i/%i passed, %i failed, %i skipped\n",
     context.count[TEST_PASS],
     context.total,
     context.count[TEST_FAIL],
@@ -142,10 +158,10 @@ test_result_t test_suite_run( const test_suite_t* suite ) {
   if( context.count[TEST_FAIL] || context.count[TEST_SKIP] ) {
     context.result = TEST_FAIL;
   } else if( context.count[TEST_WARN] ) {
-    printf( "WARNINGS: %i\n", context.count[TEST_WARN] );
+    fprintf( context.log, "WARNINGS: %i\n", context.count[TEST_WARN] );
     context.result = TEST_WARN;
   } else if( context.count[TEST_ERROR] ) {
-    printf( "ERRORS: %i\n", context.count[TEST_ERROR] );
+    fprintf( context.log, "ERRORS: %i\n", context.count[TEST_ERROR] );
     context.result = TEST_ERROR;
   } else {
     context.result = TEST_PASS;
