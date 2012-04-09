@@ -49,6 +49,10 @@ TEST( test_context ) {
   str = fnmatch_context_pop( &context );
   ASSERTSTREQ( "baz.h", str, "with str = `%s'\n", str );
 
+  ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );
+  fnmatch_context_push( &context, NULL );
+  ASSERTEQ( FNMATCH_POP, fnmatch_context_match( &context ) ); /* bzzz, it stops here */
+  
   fnmatch_context_destroy( &context );
   fnmatch_pattern_destroy( &pattern );
 }
