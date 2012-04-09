@@ -1,3 +1,7 @@
+.DS_Store
+*.swp
+*~.nib
+
 *.o
 *.a
 
@@ -5,3 +9,13 @@ test/gen-tests.c
 test/gen-benchmarks.c
 test/run-tests
 test/run-benchmarks
+
+*.pbxuser
+*.perspective
+*.perspectivev3
+
+*.mode1v3
+*.mode2v3
+
+project.xcworkspace/
+xcuserdata/
