@@ -62,7 +62,7 @@ TEST( test_context ) {
   ASSERTEQ( FNMATCH_PUSH, fnmatch_context_match( &context ) );
   fnmatch_context_push( &context, NULL );
   
-  ASSERTEQ( FNMATCH_MATCH, fnmatch_context_match( &context ) ); /* "baz.h" */
+  ASSERTEQ( FNMATCH_MATCH, fnmatch_context_match( &context ) ); /* "bar.h" */
   ASSERTEQ( FNMATCH_POP, fnmatch_context_match( &context ) );
   str = fnmatch_context_pop( &context );
   ASSERTSTREQ( "bar.h", str, "with str = `%s'\n", str );
