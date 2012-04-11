@@ -5,7 +5,10 @@
 
 #define ALLOC_SIZE(s) (((s)+16)/8*13)
 
-#if defined(HAS_MALLOC_USABLE_SIZE)
+#if defined(__APPLE__) || defined(__MACH__)
+#include <malloc/malloc.h>
+#define USABLE_SIZE(m,s) malloc_size(m)
+#elif defined(__linux__)
 #define USABLE_SIZE(m,s) malloc_usable_size(m)
 #else
 #define USABLE_SIZE(m,s) s
@@ -16,11 +19,14 @@ void* _alloc( size_t size, size_t* alloc ) {
 }
 
 void* _grow( void* mem, size_t size, size_t* alloc ) {
-  size = ALLOC_SIZE(size);
-  if( mem )
+  size = ALLOC_SIZE(size);  
+  if( mem ) {
+    if( size <= *alloc ) return mem;
+    
     mem = realloc( mem, size );
-  else
+  } else {
     mem = malloc( size );
+  }
   
   if( alloc ) *alloc = mem ? USABLE_SIZE(mem,size) : 0;
   

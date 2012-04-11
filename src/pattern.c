@@ -41,7 +41,7 @@ fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* s
   fnmatch_context_push( &context, str );
   do {
     state = fnmatch_context_match( &context );
-    switch( state ) {
+    /*switch( state ) {
       case FNMATCH_PUSH:
         fnmatch_context_push( &context, NULL );
         break;
@@ -53,9 +53,14 @@ fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* s
         return FNMATCH_ERROR;
       default:
         break;
-    }
-  } while( state != FNMATCH_STOP );
-
+    }*/
+  } while( state == FNMATCH_MATCH );
+  if( state == FNMATCH_PUSH ) {
+    fnmatch_context_push( &context, NULL );
+    state = fnmatch_context_match( &context ); /* match */
+    state = fnmatch_context_match( &context );
+  }
+  
   fnmatch_context_destroy( &context );
   return context.match == 0 ? FNMATCH_NOMATCH : FNMATCH_MATCH;
 }

@@ -106,12 +106,12 @@ void fnmatch_context_push( fnmatch_context_t* context, const char* str ) {
     FNMATCH_GROW( context->buffer, context->buflen+length+1, &(context->alloc) );
     memcpy( &(context->buffer[context->buflen]), str, length+1 );
     context->buflen += length;
-  } else if( context->buffer[context->buflen] == '\0' ) {
-    /* expose the implicit '\0' to the matcher */
-    context->buflen += 1;
-    context->state = FNMATCH_CONTINUE;
   } else {
-    context->state = FNMATCH_STOP;
+    /* expose the implicit '\0' to the matcher */
+    context->state = FNMATCH_CONTINUE;
+    FNMATCH_GROW( context->buffer, context->buflen+1, &(context->alloc) );
+    context->buffer[context->buflen] = '\0';
+    context->buflen += 1;
   }
 }
 
@@ -123,9 +123,10 @@ const char * fnmatch_context_pop( fnmatch_context_t* context ) {
     return NULL;
   }
 
-  fnmatch_vm_rewind( context );
-
   context->state = FNMATCH_CONTINUE;
+
+  fnmatch_vm_rewind( context );
+    
   return &(context->buffer[context->offset]);
 }
 
