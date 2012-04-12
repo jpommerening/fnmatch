@@ -12,14 +12,19 @@ struct test_scanner_count_s {
 
 struct test_scanner_data_s {
   const char* expr;
-  const char* push[20];
-  const char* pop[10];
+  const char* push[20]; /* a series of strings to push to the stack */
+  const char* pop[10];  /* strings that we expect to pop from the stack in that order */
   struct {
     int push, pop, match;
   } count;
 };
 
 static const test_scanner_data_t _data[] = {
+  /* directory tree:
+   *
+   * test
+   *  `- test.a, test.b
+   */
   { "test/*.[abc]",
     { "test/", "test.a", NULL,
                "test.b", NULL,
@@ -28,8 +33,18 @@ static const test_scanner_data_t _data[] = {
     { "test.a", "test.b", "test/" },
     { 7, 4, 3 } },
 
+  /* directory tree:
+   *
+   * src
+   *  `- one.o, two.c
+   *  `- internal
+   *      `- three.c
+   *  `- four.c
+   * include
+   *  `- test.h
+   */
   { "**.[ch]",
-    { "src/", "one.c", NULL,
+    { "src/", "one.o", NULL,
               "two.c", NULL,
               "internal/", "three.c", NULL,
                            NULL,
@@ -38,9 +53,9 @@ static const test_scanner_data_t _data[] = {
       "include/", "test.h", NULL,
                   NULL,
       NULL },
-    { "one.c", "two.c", "three.c", "internal/", "four.c", "src/",
+    { "one.o", "two.c", "three.c", "internal/", "four.c", "src/",
       "test.h", "include/" },
-    { 17, 9, 8 } }
+    { 17, 9, 7 } }
 };
 
 static fnmatch_state_t test_push_cb( fnmatch_context_t* context, void* info ) {
