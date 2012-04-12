@@ -19,12 +19,18 @@ void fnmatch_pattern_init( fnmatch_pattern_t* pattern ) {
 
 void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern ) {
   assert( pattern );
-  free( pattern->pattern );
-  free( pattern->program );
+  if( pattern->pattern != NULL )
+    free( pattern->pattern );
+  if( pattern->program != NULL )
+    free( pattern->program );
 }
 
 fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr ) {
   size_t length = strlen( expr ) + 1;
+  
+  assert( pattern );
+  assert( expr );
+  
   pattern->pattern = malloc( length );
   memcpy( pattern->pattern, expr, length );
   return fnmatch_compile( pattern );
@@ -39,29 +45,23 @@ fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* s
   
   fnmatch_context_init( &context, pattern );
   fnmatch_context_push( &context, str );
+  
   do {
     state = fnmatch_context_match( &context );
-    /*switch( state ) {
-      case FNMATCH_PUSH:
-        fnmatch_context_push( &context, NULL );
-        break;
-      case FNMATCH_POP:
-        fnmatch_context_pop( &context );
-        break;
-      case FNMATCH_ERROR:
-        fnmatch_context_destroy( &context );
-        return FNMATCH_ERROR;
-      default:
-        break;
-    }*/
   } while( state == FNMATCH_MATCH );
+  
   if( state == FNMATCH_PUSH ) {
     fnmatch_context_push( &context, NULL );
-    state = fnmatch_context_match( &context ); /* match */
     state = fnmatch_context_match( &context );
+    assert( state == FNMATCH_MATCH || state == FNMATCH_NOMATCH );
+  } else {
+    assert( state == FNMATCH_NOMATCH );
   }
   
   fnmatch_context_destroy( &context );
-  return context.match == 0 ? FNMATCH_NOMATCH : FNMATCH_MATCH;
+  return state;
 }
 
+fnmatch_state_t fnmatch_pattern_render( fnmatch_pattern_t* pattern, fnmatch_match_t* match ) {
+  return FNMATCH_NOMATCH;
+}

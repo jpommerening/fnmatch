@@ -27,7 +27,7 @@ static const test_pattern_t _data[] = {
 
   /* "deep" matching asterisk */
   { "**.[ch]", "test/test.c", "test.d" },
-  { "**/test/**.c", "this/is/a/test/file.c", "this/test/" },
+  { "**/test/*.c", "this/test/is/a/test/file.c", "this/test/" },
 
   /* escaping -- remember: one backslash is for the C compiler */
   { "t\\?st", "t?st", "test" },

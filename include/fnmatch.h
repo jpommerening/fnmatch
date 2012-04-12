@@ -83,7 +83,9 @@ struct fnmatch_context_s {
   
   fnmatch_state_t  state;
   fnmatch_opcode_t opcode;
-  size_t match;
+  int nmatch;
+  int nnomatch;
+  
   size_t opptr;
   size_t offset;
   size_t mark_opptr;
@@ -98,6 +100,10 @@ struct fnmatch_scanner_s {
 };
 
 struct fnmatch_match_s {
+  char*  buffer;
+  size_t buflen;
+  size_t alloc;
+  
   size_t argc;
   char*  argv[1];
 };
@@ -111,6 +117,7 @@ FNMATCH_EXTERN void fnmatch_pattern_init( fnmatch_pattern_t* pattern );
 FNMATCH_EXTERN void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern );
 FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr );
 FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* str );
+FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_render( fnmatch_pattern_t* pattern, fnmatch_match_t* match );
 /** @} */
 
 /* MARK: - Resumeable API *//**

@@ -46,6 +46,7 @@ struct test_suite_s {
   const test_t** tests;
 };
 
+#define TESTCTX __ctx
 #define TEST_UID(name) test__ ## name
 #define TEST_STRUCT(name) \
   const test_t TEST_UID(name)
@@ -74,7 +75,7 @@ struct test_suite_s {
 #define TEST_SIGN(name,...) \
   _TEST_SIGN(name,__VA_ARGS__)
 #define _TEST_SIGN(name,d,...) \
-  static void name( test_context_t* __ctx, ## __VA_ARGS__ )
+  static void name( test_context_t* TESTCTX, ## __VA_ARGS__ )
 
 /**
  * Declare test functions with this macro.
@@ -97,8 +98,8 @@ TEST_EXTERN void test_status( test_context_t* context, test_result_t result );
 TEST_EXTERN test_result_t test_run( const test_t* test );
 TEST_EXTERN test_result_t test_suite_run( const test_suite_t* suite );
 
-#define MSG(...) test_message(__ctx, __FILE__, __LINE__, "" __VA_ARGS__)
-#define RESULT(x) test_status(__ctx,x)
+#define MSG(...) test_message(TESTCTX, __FILE__, __LINE__, "" __VA_ARGS__)
+#define RESULT(x) test_status(TESTCTX,x)
 
 #define FAIL(...) do { MSG(__VA_ARGS__); RESULT(TEST_FAIL); return; } while( 0 )
 #define WARN(...) do { MSG(__VA_ARGS__); RESULT(TEST_WARN); } while( 0 )

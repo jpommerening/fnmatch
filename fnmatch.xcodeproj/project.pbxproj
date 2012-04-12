@@ -15,6 +15,8 @@
 		5958B60E1532FACA00AC8652 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 5958B5F3152E1EA800AC8652 /* test.c */; };
 		5958B6101532FAE100AC8652 /* gen-tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 5958B60F1532FAE100AC8652 /* gen-tests.c */; };
 		5958B6141532FB0400AC8652 /* fnmatch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 597B155F1519190A00229222 /* fnmatch.a */; };
+		596483AE1537588A0000E0FB /* match.c in Sources */ = {isa = PBXBuildFile; fileRef = 596483AD1537588A0000E0FB /* match.c */; };
+		596483B115376E700000E0FB /* test-scanner.c in Sources */ = {isa = PBXBuildFile; fileRef = 596483B015376E6F0000E0FB /* test-scanner.c */; };
 		597B159815191AFE00229222 /* fnmatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B159715191AFE00229222 /* fnmatch.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		597B159F1519384100229222 /* pattern.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B159E1519384100229222 /* pattern.c */; };
 		597B15A11519385200229222 /* context.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A01519385200229222 /* context.c */; };
@@ -50,6 +52,8 @@
 		5958B5F4152E1EA800AC8652 /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		5958B6001532FA9C00AC8652 /* fnmatch-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "fnmatch-test"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5958B60F1532FAE100AC8652 /* gen-tests.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "gen-tests.c"; sourceTree = "<group>"; };
+		596483AD1537588A0000E0FB /* match.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = match.c; sourceTree = "<group>"; };
+		596483B015376E6F0000E0FB /* test-scanner.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-scanner.c"; sourceTree = "<group>"; };
 		597B155F1519190A00229222 /* fnmatch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = fnmatch.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		597B159715191AFE00229222 /* fnmatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fnmatch.h; sourceTree = "<group>"; };
 		597B159E1519384100229222 /* pattern.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pattern.c; sourceTree = "<group>"; };
@@ -90,6 +94,7 @@
 				5958B5F0152E1EA800AC8652 /* test-context.c */,
 				5958B5F1152E1EA800AC8652 /* test-pattern.c */,
 				5958B5F2152E1EA800AC8652 /* test-posix.c */,
+				596483B015376E6F0000E0FB /* test-scanner.c */,
 				5958B5F3152E1EA800AC8652 /* test.c */,
 				5958B5F4152E1EA800AC8652 /* test.h */,
 			);
@@ -135,6 +140,7 @@
 				597B15A6151A61E300229222 /* internal.h */,
 				597B15AE1528A0E800229222 /* util.c */,
 				597B15A21519387D00229222 /* scanner.c */,
+				596483AD1537588A0000E0FB /* match.c */,
 				597B15A415193E0400229222 /* vm.c */,
 				598AB10E152B61D300CC6DEF /* posix.c */,
 				597B15AC152893FF00229222 /* compiler.c */,
@@ -248,6 +254,7 @@
 				5958B60B1532FABD00AC8652 /* test-context.c in Sources */,
 				5958B60C1532FAC000AC8652 /* test-pattern.c in Sources */,
 				5958B60D1532FAC600AC8652 /* test-posix.c in Sources */,
+				596483B115376E700000E0FB /* test-scanner.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +269,7 @@
 				597B15AD152893FF00229222 /* compiler.c in Sources */,
 				597B15AF1528A0E800229222 /* util.c in Sources */,
 				598AB10F152B61D300CC6DEF /* posix.c in Sources */,
+				596483AE1537588A0000E0FB /* match.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

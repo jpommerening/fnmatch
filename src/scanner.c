@@ -21,21 +21,26 @@ static fnmatch_state_t fnmatch__scanner_push( fnmatch_scanner_t* scanner, void* 
   assert( scanner );
   if( scanner->push_cb )
     return (scanner->push_cb)( &(scanner->context), info );
-  return FNMATCH_ERROR;
+
+  fnmatch_context_push( &(scanner->context), NULL );
+  return FNMATCH_CONTINUE;
 }
 
 static fnmatch_state_t fnmatch__scanner_pop( fnmatch_scanner_t* scanner, void* info ) {
   assert( scanner );
   if( scanner->pop_cb )
     return (scanner->pop_cb)( &(scanner->context), info );
-  return FNMATCH_ERROR;
+
+  fnmatch_context_pop( &(scanner->context) );
+  return FNMATCH_CONTINUE;
 }
 
 static fnmatch_state_t fnmatch__scanner_match( fnmatch_scanner_t* scanner, void* info ) {
   assert( scanner );
   if( scanner->match_cb )
     return (scanner->match_cb)( &(scanner->context), NULL, info );
-  return FNMATCH_ERROR;
+
+  return FNMATCH_CONTINUE;
 }
 
 fnmatch_state_t fnmatch_scanner_match( fnmatch_scanner_t* scanner, void* info ) {
