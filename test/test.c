@@ -92,11 +92,14 @@ static void test__run_void( test_context_t* context ) {
   test__finish( context );
 }
 
-static void test__run_data( test_context_t* context ) {
+static void test__run_data( test_context_t* context, int i ) {
   const test_t* test = context->test;
-  int i;
-  
-  for( i=0; i<(test->datalength); i++ ) {
+   
+  if( i == -1 ) {
+    for( i=0; i<(test->datalength); i++ ) {
+      test__run_data( context, i );
+    }
+  } else {
     context->data = (test->data) + (i*test->datastep);
     context->result = TEST_PASS;
     test__start( context );
@@ -107,10 +110,12 @@ static void test__run_data( test_context_t* context ) {
 }
 
 static void test__run( test_context_t* context ) {
+  int i;
+
   if( context->test->datastep == 0 ) {
     test__run_void( context );
   } else {
-    test__run_data( context );
+    test__run_data( context, -1 );
   }
   return;
 }
