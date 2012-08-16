@@ -25,6 +25,9 @@ static const test_pattern_t _data[] = {
   /* separators */
   { "t*/est", "test/est", "test" },
 
+  /* end */
+  { "test/*t", "test/est", "test/es" },
+
   /* "deep" matching asterisk */
   { "**.[ch]", "test/test.c", "test.d" },
   { "**/test/*.c", "this/test/is/a/test/file.c", "this/test/" },

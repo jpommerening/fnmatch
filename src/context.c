@@ -44,7 +44,7 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
   }
 
   while( context->state == FNMATCH_CONTINUE ) {
-    if( context->offset >= context->buflen ) {
+    if( context->op.offset >= context->buflen ) {
       context->state = FNMATCH_PUSH;
     } else {
       context->state = fnmatch_vm_op( context );
@@ -56,7 +56,7 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
           /* return (full) match */
         } else if( FNMATCH_OP_SEP == context->opcode ||
                  ( FNMATCH_OP_DEEP == context->opcode &&
-                   FNMATCH_SEP == context->buffer[context->offset] ) ) {
+                   FNMATCH_SEP == context->buffer[context->op.offset] ) ) {
           /* return (partial) match */
         } else {
           context->state = fnmatch_vm_next( context );
@@ -81,12 +81,15 @@ void fnmatch_context_reset( fnmatch_context_t* context ) {
   assert( context );
   context->state    = FNMATCH_PUSH;
   context->opcode   = FNMATCH_OP_END;
+  context->op.opptr    = 0;
+  context->op.offset   = 0;
+  context->any.opptr   = 0;
+  context->any.offset  = 0;
+  context->deep.opptr  = 0;
+  context->deep.offset = 0;
+
   context->nmatch   = 0;
   context->nnomatch = 0;
-  context->opptr    = 0;
-  context->offset   = 0;
-  context->mark_opptr  = 0;
-  context->mark_offset = 0;
 }
 
 void fnmatch_context_push( fnmatch_context_t* context, const char* str ) {
@@ -124,6 +127,6 @@ const char * fnmatch_context_pop( fnmatch_context_t* context ) {
   fnmatch_vm_rewind( context );
   context->state = FNMATCH_CONTINUE;
     
-  return &(context->buffer[context->offset]);
+  return &(context->buffer[context->op.offset]);
 }
 

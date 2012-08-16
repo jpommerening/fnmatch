@@ -57,6 +57,7 @@ typedef enum {
 } fnmatch_opcode_t;
 
 typedef struct fnmatch_pattern_s fnmatch_pattern_t;
+typedef struct fnmatch_frame_s   fnmatch_frame_t;
 typedef struct fnmatch_context_s fnmatch_context_t;
 typedef struct fnmatch_scanner_s fnmatch_scanner_t;
 typedef struct fnmatch_match_s   fnmatch_match_t;
@@ -75,6 +76,11 @@ struct fnmatch_pattern_s {
   size_t parts;  /* number of parts */
 };
 
+struct fnmatch_frame_s {
+  size_t opptr;
+  size_t offset;
+};
+
 struct fnmatch_context_s {
   fnmatch_pattern_t* pattern;
   char*  buffer;
@@ -83,13 +89,12 @@ struct fnmatch_context_s {
   
   fnmatch_state_t  state;
   fnmatch_opcode_t opcode;
+  fnmatch_frame_t  op;
+  fnmatch_frame_t  any;
+  fnmatch_frame_t  deep;
+
   int nmatch;
   int nnomatch;
-  
-  size_t opptr;
-  size_t offset;
-  size_t mark_opptr;
-  size_t mark_offset;
 };
 
 struct fnmatch_scanner_s {

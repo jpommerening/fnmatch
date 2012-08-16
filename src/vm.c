@@ -11,12 +11,12 @@
  * @{
  */
  
-#define FNMATCHCTX_OPCODE(ctx) ((ctx)->pattern->program[(ctx)->opptr])
-#define FNMATCHCTX_OPLEN(ctx)  ((ctx)->pattern->program[(ctx)->opptr+1])
-#define FNMATCHCTX_OPRLEN(ctx) ((ctx)->pattern->program[(ctx)->opptr-1])
-#define FNMATCHCTX_OPARG(ctx) &((ctx)->pattern->program[(ctx)->opptr+2])
-#define FNMATCHCTX_STR(ctx)   &((ctx)->buffer[(ctx)->offset])
-#define FNMATCHCTX_STEP(ctx,n) ((ctx)->offset += n )
+#define FNMATCHCTX_OPCODE(ctx) ((ctx)->pattern->program[(ctx)->op.opptr])
+#define FNMATCHCTX_OPLEN(ctx)  ((ctx)->pattern->program[(ctx)->op.opptr+1])
+#define FNMATCHCTX_OPRLEN(ctx) ((ctx)->pattern->program[(ctx)->op.opptr-1])
+#define FNMATCHCTX_OPARG(ctx) &((ctx)->pattern->program[(ctx)->op.opptr+2])
+#define FNMATCHCTX_STR(ctx)   &((ctx)->buffer[(ctx)->op.offset])
+#define FNMATCHCTX_STEP(ctx,n) ((ctx)->op.offset += n )
 
 /** @} */
 
@@ -26,26 +26,44 @@
  * @{
  */
 
-static void fnmatch__vm_mark( fnmatch_context_t* context ) {
-  if( context->mark_offset == 0 ) {
-    context->mark_opptr  = context->opptr;
-    context->mark_offset = context->offset + 1;
+static void fnmatch__vm_mark_any( fnmatch_context_t* context ) {
+  if( context->any.offset == 0 ) {
+    context->any.opptr  = context->op.opptr;
+    context->any.offset = context->op.offset + 1;
   }
 }
 
-static void fnmatch__vm_unmark( fnmatch_context_t* context ) {
-  context->mark_opptr  = 0;
-  context->mark_offset = 0;
+static void fnmatch__vm_unmark_any( fnmatch_context_t* context ) {
+  context->any.opptr  = 0;
+  context->any.offset = 0;
+}
+
+static void fnmatch__vm_mark_deep( fnmatch_context_t* context ) {
+  if( context->deep.offset == 0 ) {
+    context->deep.opptr  = context->op.opptr;
+    context->deep.offset = context->op.offset + 1;
+  }
+}
+
+static void fnmatch__vm_unmark_deep( fnmatch_context_t* context ) {
+  context->deep.opptr  = 0;
+  context->deep.offset = 0;
 }
 
 static fnmatch_state_t fnmatch__vm_restore( fnmatch_context_t* context ) {
-  if( context->mark_offset == 0 )
+  if( context->any.offset == 0 && context->deep.offset == 0 )
     return FNMATCH_STOP;
-    
-  context->opptr  = context->mark_opptr;
-  context->offset = context->mark_offset;
+
+  if( context->any.opptr > context->deep.opptr ) {
+    context->op.opptr  = context->any.opptr;
+    context->op.offset = context->any.offset;
+    fnmatch__vm_unmark_any( context );
+  } else {
+    context->op.opptr  = context->deep.opptr;
+    context->op.offset = context->deep.offset;
+    fnmatch__vm_unmark_deep( context );
+  }
   
-  fnmatch__vm_unmark( context );
   return FNMATCH_CONTINUE;
 }
 
@@ -68,9 +86,9 @@ static fnmatch_state_t fnmatch__vm_cond( fnmatch_context_t* context, int conditi
 
 static fnmatch_state_t fnmatch__vm_fixed( fnmatch_context_t* context, const char* str,
                                           size_t oplen, const char* oparg ) {
-  if( (oplen + context->offset) > context->buflen ) {
-    /* signal an early exit for wildcard matches? experimental .. */
-    fnmatch__vm_unmark( context );
+  if( (oplen + context->op.offset) > context->buflen ) {
+    /* signal an early exit for "*" matches? experimental .. */
+    fnmatch__vm_unmark_any( context );
     return FNMATCH_NOMATCH;
   }
   return fnmatch__vm_cond( context, memcmp( str, oparg, oplen ) == 0, oplen );
@@ -111,19 +129,22 @@ static fnmatch_state_t fnmatch__vm_one( fnmatch_context_t* context, const char* 
 }
 
 static fnmatch_state_t fnmatch__vm_any( fnmatch_context_t* context, const char* str ) {
-  if( (str[0] == '\0') || (str[0] == FNMATCH_SEP) ) {
-    fnmatch__vm_unmark( context );
+  if( str[0] == '\0' ) {
+    fnmatch__vm_unmark_any( context );
+    fnmatch__vm_unmark_deep( context );
+  } else if( (str[0] == FNMATCH_SEP) ) {
+    fnmatch__vm_unmark_any( context );
   } else {
-    fnmatch__vm_mark( context );
+    fnmatch__vm_mark_any( context );
   }
   return FNMATCH_MATCH;
 }
 
 static fnmatch_state_t fnmatch__vm_deep( fnmatch_context_t* context, const char* str ) {
   if( str[0] == '\0' ) {
-    fnmatch__vm_unmark( context );
+    fnmatch__vm_unmark_deep( context );
   } else {
-    fnmatch__vm_mark( context );
+    fnmatch__vm_mark_deep( context );
   }
   return FNMATCH_MATCH;
 }
@@ -132,9 +153,9 @@ static fnmatch_state_t fnmatch__vm_sep( fnmatch_context_t* context, const char* 
   if( str[0] == FNMATCH_SEP ) {
     FNMATCHCTX_STEP(context, 1);
     
-    if( context->pattern->program[context->mark_opptr] != FNMATCH_OP_DEEP ) {
+    if( context->any.opptr >= context->deep.opptr ) {
       /* no turning back to an "*" if we're past a separator */
-      fnmatch__vm_unmark( context );
+      fnmatch__vm_unmark_any( context );
     }
     return FNMATCH_MATCH;
   }
@@ -146,7 +167,8 @@ static fnmatch_state_t fnmatch__vm_end( fnmatch_context_t* context, const char* 
     FNMATCHCTX_STEP(context, 1);
 
     /* no turning back to "*" or "**" if we're finished */
-    fnmatch__vm_unmark( context );
+    fnmatch__vm_unmark_any( context );
+    fnmatch__vm_unmark_deep( context );
     return FNMATCH_MATCH;
   }
   return FNMATCH_NOMATCH;
@@ -164,29 +186,29 @@ fnmatch_state_t fnmatch_vm_next( fnmatch_context_t* context ) {
   
   if( FNMATCHCTX_OPCODE(context) == FNMATCH_OP_END )
     return FNMATCH_STOP;
-  if( context->opptr >= context->pattern->proglen )
+  if( context->op.opptr >= context->pattern->proglen )
     return FNMATCH_STOP;
   
   oplen = FNMATCHCTX_OPLEN(context);
-  if( oplen ) context->opptr += oplen+3;
-  else        context->opptr += 2;
+  if( oplen ) context->op.opptr += oplen+3;
+  else        context->op.opptr += 2;
   return FNMATCH_CONTINUE;
 }
 
 fnmatch_state_t fnmatch_vm_prev( fnmatch_context_t* context ) {
   size_t oplen;
 
-  if( context->opptr <= 0 )
+  if( context->op.opptr <= 0 )
     return FNMATCH_STOP;
   
   oplen = FNMATCHCTX_OPRLEN(context);
-  if( oplen ) context->opptr -= oplen+3;
-  else        context->opptr -= 2;
+  if( oplen ) context->op.opptr -= oplen+3;
+  else        context->op.opptr -= 2;
   return FNMATCH_CONTINUE;
 }
 
 fnmatch_state_t fnmatch_vm_retry( fnmatch_context_t* context ) {
-  if( context->opptr == 0 )
+  if( context->op.opptr == 0 )
     return FNMATCH_STOP;
   
   return fnmatch__vm_restore( context );
@@ -201,29 +223,31 @@ fnmatch_state_t fnmatch_vm_rewind( fnmatch_context_t *context ) {
   /* clean me up */
   
   if( *FNMATCHCTX_STR(context) == '\0' )
-    context->offset--;
+    context->op.offset--;
   if( *FNMATCHCTX_STR(context) == FNMATCH_SEP )
-    context->offset--;
+    context->op.offset--;
   
-  while( (context->offset) > 0 ) {
+  while( (context->op.offset) > 0 ) {
     if( *FNMATCHCTX_STR(context) == FNMATCH_SEP ) {
-      context->offset++;
+      context->op.offset++;
       break;
     }
-    context->offset--;
+    context->op.offset--;
   }
   
   /* rewind the program accordingly */
   while( fnmatch_vm_prev( context ) == FNMATCH_CONTINUE ) {
+    /* there's an error around here */
     if( FNMATCHCTX_OPCODE(context) == FNMATCH_OP_DEEP &&
-        context->mark_offset < context->offset ) break;
+        context->deep.offset < context->op.offset )
+      break;
     if( FNMATCHCTX_OPCODE(context) == FNMATCH_OP_SEP ) {
       fnmatch_vm_next( context );
       break;
     }
   }
   
-  context->buflen = context->offset;
+  context->buflen = context->op.offset;
   return FNMATCH_CONTINUE;
 }
 
