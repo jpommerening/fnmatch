@@ -9,6 +9,7 @@
 #include <malloc/malloc.h>
 #define USABLE_SIZE(m,s) malloc_size(m)
 #elif defined(__linux__)
+#include <malloc.h>
 #define USABLE_SIZE(m,s) malloc_usable_size(m)
 #else
 #define USABLE_SIZE(m,s) s
