@@ -2,7 +2,7 @@
 #include "fnmatch.h"
 #include "internal.h"
 #include <stdlib.h>
-
+/*
 void fnmatch_match_init( fnmatch_match_t* match, fnmatch_pattern_t* pattern ) {
   match->buffer  = malloc( pattern->groups );
   match->buflen  = 0;
@@ -14,3 +14,4 @@ void fnmatch_match_init( fnmatch_match_t* match, fnmatch_pattern_t* pattern ) {
 void fnmatch_match_destroy( fnmatch_match_t* match ) {
   free( match->buffer );
 }
+*/
