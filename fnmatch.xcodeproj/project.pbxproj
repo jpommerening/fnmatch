@@ -39,10 +39,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		593A9B6E153335CE0029A38D /* config-mingw.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; name = "config-mingw.mk"; path = "../glob/config-mingw.mk"; sourceTree = "<group>"; };
-		593A9B70153335DA0029A38D /* config-unix.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; name = "config-unix.mk"; path = "../glob/config-unix.mk"; sourceTree = "<group>"; };
-		593A9B71153335DA0029A38D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../glob/LICENSE; sourceTree = "<group>"; };
-		593A9B72153335DA0029A38D /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; name = Makefile; path = ../glob/Makefile; sourceTree = "<group>"; };
+		593A9B6E153335CE0029A38D /* config-mingw.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = "config-mingw.mk"; sourceTree = "<group>"; };
+		593A9B70153335DA0029A38D /* config-unix.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = "config-unix.mk"; sourceTree = "<group>"; };
+		593A9B71153335DA0029A38D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		593A9B72153335DA0029A38D /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = Makefile; sourceTree = "<group>"; };
 		5958B5ED152E1EA800AC8652 /* gen-tests.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "gen-tests.sh"; sourceTree = "<group>"; };
 		5958B5EF152E1EA800AC8652 /* run-tests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "run-tests.c"; sourceTree = "<group>"; };
 		5958B5F0152E1EA800AC8652 /* test-context.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "test-context.c"; sourceTree = "<group>"; };
@@ -189,6 +189,7 @@
 				597B155B1519190A00229222 /* Sources */,
 				597B155C1519190A00229222 /* Frameworks */,
 				597B155D1519190A00229222 /* Headers */,
+				415B14D215E6BD6C0003F8B4 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -205,7 +206,7 @@
 		597B15561519190A00229222 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0440;
 				ORGANIZATIONNAME = "aixigo AG";
 			};
 			buildConfigurationList = 597B15591519190A00229222 /* Build configuration list for PBXProject "fnmatch" */;
@@ -227,6 +228,24 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		415B14D215E6BD6C0003F8B4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/test/test-context.c",
+				"$(SRCROOT)/test/test-pattern.c",
+				"$(SRCROOT)/test/test-posix.c",
+				"$(SRCROOT)/test/test-scanner.c",
+			);
+			outputPaths = (
+				"$(SRCROOT)/test/gen-tests.c",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "declare -a SCRIPT_INPUT_FILES=()\ncd ${PROJECT_DIR}\n\nfor ((i=0; i<${SCRIPT_INPUT_FILE_COUNT}; i++ )) ; do\n  SCRIPT_INPUT_FILES[$i]=`eval echo \\\\${SCRIPT_INPUT_FILE_${i}#${PROJECT_DIR}/}`\ndone\n      \necho \"./test/gen-tests.sh ${SCRIPT_INPUT_FILES[@]} > ${SCRIPT_OUTPUT_FILE_0}\"\n./test/gen-tests.sh \"${SCRIPT_INPUT_FILES[@]}\" > ${SCRIPT_OUTPUT_FILE_0}";
+		};
 		5958B6111532FAF800AC8652 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -239,7 +258,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${PROJECT_DIR}/test/gen-tests.sh test/test-*.c";
+			shellScript = "${PROJECT_DIR}/test/gen-tests.sh test/test-*.c > test/gen-tests.sh";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -362,6 +381,7 @@
 		597B15641519190A00229222 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -370,6 +390,7 @@
 		597B15651519190A00229222 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
