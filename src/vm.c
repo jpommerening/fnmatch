@@ -129,7 +129,7 @@ static fnmatch_state_t fnmatch__vm_one( fnmatch_context_t* context, const char* 
 }
 
 static fnmatch_state_t fnmatch__vm_any( fnmatch_context_t* context, const char* str ) {
-  if( str[0] == '\0' ) {
+  if( str[0] == '\0' && context->op.offset < context->buflen ) {
     fnmatch__vm_unmark_any( context );
     fnmatch__vm_unmark_deep( context );
   } else if( (str[0] == FNMATCH_SEP) ) {
@@ -141,7 +141,7 @@ static fnmatch_state_t fnmatch__vm_any( fnmatch_context_t* context, const char* 
 }
 
 static fnmatch_state_t fnmatch__vm_deep( fnmatch_context_t* context, const char* str ) {
-  if( str[0] == '\0' ) {
+  if( str[0] == '\0' && context->op.offset < context->buflen ) {
     fnmatch__vm_unmark_deep( context );
   } else {
     fnmatch__vm_mark_deep( context );
@@ -163,7 +163,7 @@ static fnmatch_state_t fnmatch__vm_sep( fnmatch_context_t* context, const char* 
 }
 
 static fnmatch_state_t fnmatch__vm_end( fnmatch_context_t* context, const char* str ) {
-  if( str[0] == '\0' ) {
+  if( str[0] == '\0' && context->op.offset < context->buflen ) {
     FNMATCHCTX_STEP(context, 1);
 
     /* no turning back to "*" or "**" if we're finished */

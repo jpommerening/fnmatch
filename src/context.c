@@ -97,7 +97,7 @@ void fnmatch_context_push( fnmatch_context_t* context, const char* str ) {
 
   assert( context );
 
-  if( context->state != FNMATCH_PUSH ) {
+  if( !(context->state == FNMATCH_PUSH || context->state == FNMATCH_CONTINUE) ) {
     context->state = FNMATCH_ERROR;
     return;
   }
