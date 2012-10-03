@@ -117,7 +117,7 @@ static size_t fnmatch__compiler_fixed( buffer_t* buffer, const char* expr ) {
  * @param expr the expression to compile.
  * @return the compiled pattern program.
  */
-void* fnmatch_compile( const char* expr, size_t* length ) {
+void* fnmatch_compile( const char* expr, size_t* length, fnmatch_stats_t* stats ) {
   buffer_t buffer = BUFFER_INIT;
   
   size_t read   = 0;
@@ -154,10 +154,10 @@ void* fnmatch_compile( const char* expr, size_t* length ) {
         break;
     }
   } while( *expr != '\0' );
-/*
-  pattern->mchars = mchars;
-  pattern->groups = groups;
-  pattern->parts  = parts;
- */
+
+  stats->mchars = mchars;
+  stats->groups = groups;
+  stats->parts  = parts;
+
   return buffer_detach( &buffer, length );
 }

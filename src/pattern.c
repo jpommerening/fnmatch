@@ -10,9 +10,10 @@ void fnmatch_pattern_init( fnmatch_pattern_t* pattern ) {
   pattern->pattern = NULL;
   pattern->program = NULL;
   pattern->proglen = 0;
-  pattern->mchars = 0;
-  pattern->groups = 0;
-  pattern->parts = 0;
+
+  pattern->stats.mchars = 0;
+  pattern->stats.groups = 0;
+  pattern->stats.parts  = 0;
 }
 
 static void fnmatch__pattern_free( fnmatch_pattern_t* pattern ) {
@@ -30,11 +31,12 @@ void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern ) {
 fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr ) {
   void*  program;
   size_t proglen;
+  fnmatch_stats_t stats;
   
   assert( pattern );
   assert( expr );
   
-  program = fnmatch_compile( expr, &proglen );
+  program = fnmatch_compile( expr, &proglen, &stats );
   
   if( program == NULL )
     return FNMATCH_ERROR;
@@ -44,6 +46,9 @@ fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char*
   pattern->pattern = strdup( expr );
   pattern->program = program;
   pattern->proglen = proglen;
+  pattern->stats.mchars = stats.mchars;
+  pattern->stats.groups = stats.groups;
+  pattern->stats.parts  = stats.parts;
   
   return FNMATCH_CONTINUE;
 }

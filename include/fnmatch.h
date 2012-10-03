@@ -57,7 +57,8 @@ typedef enum {
   FNMATCH_OP_SEP,
   FNMATCH_OP_END
 } fnmatch_opcode_t;
-
+  
+typedef struct fnmatch_stats_s   fnmatch_stats_t;
 typedef struct fnmatch_pattern_s fnmatch_pattern_t;
 typedef struct fnmatch_frame_s   fnmatch_frame_t;
 typedef struct fnmatch_context_s fnmatch_context_t;
@@ -68,15 +69,18 @@ typedef fnmatch_state_t (*fnmatch_push_cb)( fnmatch_context_t* ctx, void* info )
 typedef fnmatch_state_t (*fnmatch_pop_cb)( fnmatch_context_t* ctx, void* info );
 typedef fnmatch_state_t (*fnmatch_match_cb)( fnmatch_context_t* ctx, fnmatch_match_t* match, void* info );
 
-struct fnmatch_pattern_s {
-  char*  pattern;
-  
-  char*  program;
-  size_t proglen;
-  
+struct fnmatch_stats_s {
   size_t mchars; /* minimum chars to match (sum of all fixed, sep, one, chars) */
   size_t groups; /* number of groups */
   size_t parts;  /* number of parts */
+};
+  
+struct fnmatch_pattern_s {
+  char*  pattern;
+  char*  program;
+  size_t proglen;
+  
+  fnmatch_stats_t stats;
 };
 
 struct fnmatch_frame_s {

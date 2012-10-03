@@ -79,8 +79,8 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
 
 void fnmatch_context_reset( fnmatch_context_t* context ) {
   assert( context );
-  context->state    = FNMATCH_PUSH;
-  context->opcode   = FNMATCH_OP_END;
+  context->state  = FNMATCH_PUSH;
+  context->opcode = FNMATCH_OP_END;
   context->op.opptr    = 0;
   context->op.offset   = 0;
   context->any.opptr   = 0;
