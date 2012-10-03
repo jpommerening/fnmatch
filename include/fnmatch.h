@@ -34,6 +34,8 @@ extern "C" {
 #include <unistd.h>
 #include <stddef.h>
 
+#include <buffer.h>
+
 #define FNMATCH_EXTERN extern
 
 typedef enum {
@@ -55,7 +57,8 @@ typedef enum {
   FNMATCH_OP_SEP,
   FNMATCH_OP_END
 } fnmatch_opcode_t;
-
+  
+typedef struct fnmatch_stats_s   fnmatch_stats_t;
 typedef struct fnmatch_pattern_s fnmatch_pattern_t;
 typedef struct fnmatch_frame_s   fnmatch_frame_t;
 typedef struct fnmatch_context_s fnmatch_context_t;
@@ -66,14 +69,18 @@ typedef fnmatch_state_t (*fnmatch_push_cb)( fnmatch_context_t* ctx, void* info )
 typedef fnmatch_state_t (*fnmatch_pop_cb)( fnmatch_context_t* ctx, void* info );
 typedef fnmatch_state_t (*fnmatch_match_cb)( fnmatch_context_t* ctx, fnmatch_match_t* match, void* info );
 
+struct fnmatch_stats_s {
+  size_t mchars; /* minimum chars to match (sum of all fixed, sep, one, chars) */
+  size_t groups; /* number of groups */
+  size_t parts;  /* number of parts */
+};
+  
 struct fnmatch_pattern_s {
   char*  pattern;
   char*  program;
   size_t proglen;
-  size_t alloc;
-  size_t mchars; /* minimum chars to match (sum of all fixed, sep, one, chars) */
-  size_t groups; /* number of groups */
-  size_t parts;  /* number of parts */
+  
+  fnmatch_stats_t stats;
 };
 
 struct fnmatch_frame_s {
@@ -83,10 +90,8 @@ struct fnmatch_frame_s {
 
 struct fnmatch_context_s {
   fnmatch_pattern_t* pattern;
-  char*  buffer;
-  size_t buflen;
-  size_t alloc;
-  
+  buffer_t buffer;
+
   fnmatch_state_t  state;
   fnmatch_opcode_t opcode;
   fnmatch_frame_t  op;
@@ -105,9 +110,7 @@ struct fnmatch_scanner_s {
 };
 
 struct fnmatch_match_s {
-  char*  buffer;
-  size_t buflen;
-  size_t alloc;
+  buffer_t buffer; /* ? */
   
   size_t argc;
   char*  argv[1];

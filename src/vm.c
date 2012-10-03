@@ -15,7 +15,7 @@
 #define FNMATCHCTX_OPLEN(ctx)  ((ctx)->pattern->program[(ctx)->op.opptr+1])
 #define FNMATCHCTX_OPRLEN(ctx) ((ctx)->pattern->program[(ctx)->op.opptr-1])
 #define FNMATCHCTX_OPARG(ctx) &((ctx)->pattern->program[(ctx)->op.opptr+2])
-#define FNMATCHCTX_STR(ctx)   &((ctx)->buffer[(ctx)->op.offset])
+#define FNMATCHCTX_STR(ctx)   &((ctx)->buffer.data[(ctx)->op.offset])
 #define FNMATCHCTX_STEP(ctx,n) ((ctx)->op.offset += n )
 
 /** @} */
@@ -86,7 +86,7 @@ static fnmatch_state_t fnmatch__vm_cond( fnmatch_context_t* context, int conditi
 
 static fnmatch_state_t fnmatch__vm_fixed( fnmatch_context_t* context, const char* str,
                                           size_t oplen, const char* oparg ) {
-  if( (oplen + context->op.offset) > context->buflen ) {
+  if( (oplen + context->op.offset) > context->buffer.length ) {
     /* signal an early exit for "*" matches? experimental .. */
     fnmatch__vm_unmark_any( context );
     return FNMATCH_NOMATCH;
@@ -129,7 +129,7 @@ static fnmatch_state_t fnmatch__vm_one( fnmatch_context_t* context, const char* 
 }
 
 static fnmatch_state_t fnmatch__vm_any( fnmatch_context_t* context, const char* str ) {
-  if( str[0] == '\0' && context->op.offset < context->buflen ) {
+  if( str[0] == '\0' && context->op.offset < context->buffer.length ) {
     fnmatch__vm_unmark_any( context );
     fnmatch__vm_unmark_deep( context );
   } else if( (str[0] == FNMATCH_SEP) ) {
@@ -141,7 +141,7 @@ static fnmatch_state_t fnmatch__vm_any( fnmatch_context_t* context, const char* 
 }
 
 static fnmatch_state_t fnmatch__vm_deep( fnmatch_context_t* context, const char* str ) {
-  if( str[0] == '\0' && context->op.offset < context->buflen ) {
+  if( str[0] == '\0' && context->op.offset < context->buffer.length ) {
     fnmatch__vm_unmark_deep( context );
   } else {
     fnmatch__vm_mark_deep( context );
@@ -163,7 +163,7 @@ static fnmatch_state_t fnmatch__vm_sep( fnmatch_context_t* context, const char* 
 }
 
 static fnmatch_state_t fnmatch__vm_end( fnmatch_context_t* context, const char* str ) {
-  if( str[0] == '\0' && context->op.offset < context->buflen ) {
+  if( str[0] == '\0' && context->op.offset < context->buffer.length ) {
     FNMATCHCTX_STEP(context, 1);
 
     /* no turning back to "*" or "**" if we're finished */
@@ -247,7 +247,10 @@ fnmatch_state_t fnmatch_vm_rewind( fnmatch_context_t *context ) {
     }
   }
   
-  context->buflen = context->op.offset;
+  /* we don't use buffer_setlen() here because we do not want to
+     put a \0 at the beginning of the string that is returned by
+     fnmatch_pop(). We do not need that \0 yet anyway. :) */
+  context->buffer.length = context->op.offset;
   return FNMATCH_CONTINUE;
 }
 
