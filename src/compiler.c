@@ -29,7 +29,6 @@ static size_t fnmatch__compiler_oparg(
   const char* delim, size_t ndelim,
   const char* esc,   size_t nesc ) {
 
-  char   byte[1] = { 0 };
   size_t read, written;
   size_t start = buffer->length;
   
@@ -37,10 +36,9 @@ static size_t fnmatch__compiler_oparg(
   written = buffer->length - start;
   
   if( written ) {
-    byte[0] = written;
     /*printf( "Push oparg %i:%s\n", (int) (pattern->proglen - start), &(pattern->program[start]) );*/
-    buffer->data[start-1] = byte[0];
-    buffer_append( buffer, &(byte[0]), 1 );
+    buffer->data[start-1] = (char)written;
+    buffer_appendc( buffer, (char)written );
   }
   
   return read;

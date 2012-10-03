@@ -106,7 +106,7 @@ void fnmatch_context_push( fnmatch_context_t* context, const char* str ) {
   if( length > 0 ) {
     buffer_append( &(context->buffer), str, length );
   } else {
-    buffer_append( &(context->buffer), "", 1 );
+    buffer_appendc( &(context->buffer), '\0' );
   }
   context->state = FNMATCH_CONTINUE;
 }
