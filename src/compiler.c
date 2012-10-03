@@ -1,7 +1,6 @@
 #define _IN_FNMATCH_
 #include "fnmatch.h"
 #include "internal.h"
-#include <buffer.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>

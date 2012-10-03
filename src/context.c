@@ -10,16 +10,16 @@ void fnmatch_context_init( fnmatch_context_t* context, fnmatch_pattern_t* patter
   assert( context );
   assert( pattern );
   
+  buffer_init( &(context->buffer), 0 /* pattern->mchars */ );
   context->pattern = pattern;
-  FNMATCH_ALLOC( context->buffer, pattern->mchars, &(context->alloc) );
-  context->buflen = 0;
   
   fnmatch_context_reset( context );
 }
 
 void fnmatch_context_destroy( fnmatch_context_t* context ) {
   assert( context );
-  free( context->buffer );
+  
+  buffer_destroy( &(context->buffer) );
 }
 
 fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
@@ -44,7 +44,7 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
   }
 
   while( context->state == FNMATCH_CONTINUE ) {
-    if( context->op.offset >= context->buflen ) {
+    if( context->op.offset >= context->buffer.length ) {
       context->state = FNMATCH_PUSH;
     } else {
       context->state = fnmatch_vm_op( context );
@@ -56,7 +56,7 @@ fnmatch_state_t fnmatch_context_match( fnmatch_context_t* context ) {
           /* return (full) match */
         } else if( FNMATCH_OP_SEP == context->opcode ||
                  ( FNMATCH_OP_DEEP == context->opcode &&
-                   FNMATCH_SEP == context->buffer[context->op.offset] ) ) {
+                   FNMATCH_SEP == context->buffer.data[context->op.offset] ) ) {
           /* return (partial) match */
         } else {
           context->state = fnmatch_vm_next( context );
@@ -104,13 +104,9 @@ void fnmatch_context_push( fnmatch_context_t* context, const char* str ) {
 
   length = (str != NULL) ? strlen( str ) : 0;
   if( length > 0 ) {
-    FNMATCH_GROW( context->buffer, context->buflen+length+1, &(context->alloc) );
-    memcpy( &(context->buffer[context->buflen]), str, length+1 );
-    context->buflen += length;
+    buffer_append( &(context->buffer), str, length );
   } else {
-    FNMATCH_GROW( context->buffer, context->buflen+1, &(context->alloc) );
-    context->buffer[context->buflen] = '\0';
-    context->buflen += 1;
+    buffer_append( &(context->buffer), "", 1 );
   }
   context->state = FNMATCH_CONTINUE;
 }
@@ -127,6 +123,6 @@ const char * fnmatch_context_pop( fnmatch_context_t* context ) {
   fnmatch_vm_rewind( context );
   context->state = FNMATCH_CONTINUE;
     
-  return &(context->buffer[context->op.offset]);
+  return &(context->buffer.data[context->op.offset]);
 }
 

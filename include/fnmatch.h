@@ -34,6 +34,8 @@ extern "C" {
 #include <unistd.h>
 #include <stddef.h>
 
+#include <buffer.h>
+
 #define FNMATCH_EXTERN extern
 
 typedef enum {
@@ -84,10 +86,8 @@ struct fnmatch_frame_s {
 
 struct fnmatch_context_s {
   fnmatch_pattern_t* pattern;
-  char*  buffer;
-  size_t buflen;
-  size_t alloc;
-  
+  buffer_t buffer;
+
   fnmatch_state_t  state;
   fnmatch_opcode_t opcode;
   fnmatch_frame_t  op;
@@ -106,9 +106,7 @@ struct fnmatch_scanner_s {
 };
 
 struct fnmatch_match_s {
-  char*  buffer;
-  size_t buflen;
-  size_t alloc;
+  buffer_t buffer; /* ? */
   
   size_t argc;
   char*  argv[1];
