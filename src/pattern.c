@@ -7,33 +7,45 @@
 
 void fnmatch_pattern_init( fnmatch_pattern_t* pattern ) {
   assert( pattern );
-  
   pattern->pattern = NULL;
   pattern->program = NULL;
   pattern->proglen = 0;
-  pattern->alloc = 0;
   pattern->mchars = 0;
   pattern->groups = 0;
   pattern->parts = 0;
 }
 
-void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern ) {
-  assert( pattern );
+static void fnmatch__pattern_free( fnmatch_pattern_t* pattern ) {
   if( pattern->pattern != NULL )
     free( pattern->pattern );
   if( pattern->program != NULL )
     free( pattern->program );
 }
 
+void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern ) {
+  assert( pattern );
+  fnmatch__pattern_free( pattern );
+}
+
 fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr ) {
-  size_t length = strlen( expr ) + 1;
+  void*  program;
+  size_t proglen;
   
   assert( pattern );
   assert( expr );
   
-  pattern->pattern = malloc( length );
-  memcpy( pattern->pattern, expr, length );
-  return fnmatch_compile( pattern );
+  program = fnmatch_compile( expr, &proglen );
+  
+  if( program == NULL )
+    return FNMATCH_ERROR;
+  
+  fnmatch__pattern_free( pattern );
+  
+  pattern->pattern = strdup( expr );
+  pattern->program = program;
+  pattern->proglen = proglen;
+  
+  return FNMATCH_CONTINUE;
 }
 
 fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* str ) {

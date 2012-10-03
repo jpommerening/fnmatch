@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		416FD75C161A233500AEA066 /* mem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 416FD75B161A233500AEA066 /* mem.a */; };
 		5958B5FB152E1EA800AC8652 /* test.h in Headers */ = {isa = PBXBuildFile; fileRef = 5958B5F4152E1EA800AC8652 /* test.h */; };
 		5958B60A1532FABA00AC8652 /* run-tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 5958B5EF152E1EA800AC8652 /* run-tests.c */; };
 		5958B60B1532FABD00AC8652 /* test-context.c in Sources */ = {isa = PBXBuildFile; fileRef = 5958B5F0152E1EA800AC8652 /* test-context.c */; };
@@ -39,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		416FD75B161A233500AEA066 /* mem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = mem.a; path = "../../../Library/Developer/Xcode/DerivedData/c-gcrsylqxuhhkuvajhcnpfzpwxmek/Build/Products/Debug/mem.a"; sourceTree = "<group>"; };
 		593A9B6E153335CE0029A38D /* config-mingw.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = "config-mingw.mk"; sourceTree = "<group>"; };
 		593A9B70153335DA0029A38D /* config-unix.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = "config-unix.mk"; sourceTree = "<group>"; };
 		593A9B71153335DA0029A38D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				416FD75C161A233500AEA066 /* mem.a in Frameworks */,
 				5958B6141532FB0400AC8652 /* fnmatch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -85,6 +88,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		416FD75D161A233B00AEA066 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				416FD75B161A233500AEA066 /* mem.a */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
 		5958B5EB152E1EA800AC8652 /* test */ = {
 			isa = PBXGroup;
 			children = (
@@ -111,6 +122,7 @@
 				597B158F15191A4A00229222 /* include */,
 				597B159015191A4A00229222 /* src */,
 				5958B5EB152E1EA800AC8652 /* test */,
+				416FD75D161A233B00AEA066 /* Libraries */,
 				597B15601519190A00229222 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -168,7 +180,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5958B6071532FA9D00AC8652 /* Build configuration list for PBXNativeTarget "fnmatch-test" */;
 			buildPhases = (
-				5958B6111532FAF800AC8652 /* ShellScript */,
 				5958B5FC1532FA9C00AC8652 /* Sources */,
 				5958B5FD1532FA9C00AC8652 /* Frameworks */,
 			);
@@ -246,20 +257,6 @@
 			shellPath = /bin/sh;
 			shellScript = "declare -a SCRIPT_INPUT_FILES=()\ncd ${PROJECT_DIR}\n\nfor ((i=0; i<${SCRIPT_INPUT_FILE_COUNT}; i++ )) ; do\n  SCRIPT_INPUT_FILES[$i]=`eval echo \\\\${SCRIPT_INPUT_FILE_${i}#${PROJECT_DIR}/}`\ndone\n      \necho \"./test/gen-tests.sh ${SCRIPT_INPUT_FILES[@]} > ${SCRIPT_OUTPUT_FILE_0}\"\n./test/gen-tests.sh \"${SCRIPT_INPUT_FILES[@]}\" > ${SCRIPT_OUTPUT_FILE_0}";
 		};
-		5958B6111532FAF800AC8652 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-				"",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "${PROJECT_DIR}/test/gen-tests.sh test/test-*.c > test/gen-tests.sh";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -306,6 +303,10 @@
 		5958B6081532FA9D00AC8652 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Library/Developer/Xcode/DerivedData/c-gcrsylqxuhhkuvajhcnpfzpwxmek/Build/Products/Debug\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -313,6 +314,10 @@
 		5958B6091532FA9D00AC8652 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Library/Developer/Xcode/DerivedData/c-gcrsylqxuhhkuvajhcnpfzpwxmek/Build/Products/Debug\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -323,7 +328,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -332,7 +337,6 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -358,9 +362,8 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

@@ -68,9 +68,10 @@ typedef fnmatch_state_t (*fnmatch_match_cb)( fnmatch_context_t* ctx, fnmatch_mat
 
 struct fnmatch_pattern_s {
   char*  pattern;
+  
   char*  program;
   size_t proglen;
-  size_t alloc;
+  
   size_t mchars; /* minimum chars to match (sum of all fixed, sep, one, chars) */
   size_t groups; /* number of groups */
   size_t parts;  /* number of parts */

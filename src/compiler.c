@@ -1,88 +1,76 @@
 #define _IN_FNMATCH_
 #include "fnmatch.h"
 #include "internal.h"
+#include <buffer.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
 
-static void fnmatch__compiler_append( fnmatch_pattern_t* pattern, const char* data, size_t length ) {
-  size_t avail = pattern->alloc - pattern->proglen;
-  if( avail < length ) {
-    FNMATCH_GROW( pattern->program, length, &(pattern->alloc) );
-  }
-  FNMATCH_CPY( pattern->program, pattern->proglen, data, 0, length );
-  pattern->proglen += length;
-}
-
 /**
  * @brief Start an operation. Store the opcode and reserve a byte
  * for parameter length.
- * @param pattern the pattern to write to.
+ * @param buffer the buffer to write to.
  * @param opcode  the opcode to write.
  */
-static void fnmatch__compiler_opcode( fnmatch_pattern_t* pattern, fnmatch_opcode_t opcode ) {
+static void fnmatch__compiler_opcode( buffer_t* buffer, fnmatch_opcode_t opcode ) {
   char word[2] = { 0, 0 };
   word[0] = opcode;
-  fnmatch__compiler_append( pattern, &(word[0]), 2 );
+  buffer_append( buffer, &(word[0]), 2 );
   /*printf( "Push opcode %i\n", opcode );*/
 }
 
-static int character_in_set( char c, const char* set, size_t length ) {
-  while( length > 0 )
-    if( c == set[--length] ) return 1;
-  return 0;
-}
-
+/**
+ * @brief Append an optional argument to the previous operation.
+ * @return the number of bytes read.
+ */
 static size_t fnmatch__compiler_oparg(
-  fnmatch_pattern_t* pattern, char c,
-  const char* data,  size_t length,
+  buffer_t* buffer, char c,
+  const char* data,  size_t len,
   const char* delim, size_t ndelim,
   const char* esc,   size_t nesc ) {
-  
-  size_t i, j, start;
-  start = pattern->proglen;
-  
-  for( i=j=0; (i<length) && !character_in_set( data[i], delim, ndelim ); i++ ) {
-    if( data[i] == c && character_in_set(data[i+1], esc, nesc ) ) {
-      fnmatch__compiler_append( pattern, data+j, i-j );
-      j = ++i;
-    }
-  }
-  fnmatch__compiler_append( pattern, data+j, i-j );
-  if( pattern->proglen != start ) {
-    /*printf( "Push oparg %i:%s\n", (int) (pattern->proglen - start), &(pattern->program[start]) );*/
-    pattern->program[start-1] = (char) (pattern->proglen - start);
-    fnmatch__compiler_append( pattern, &(pattern->program[start-1]), 1 );
-  }
 
-  return i;
+  char   byte[1] = { 0 };
+  size_t read, written;
+  size_t start = buffer->length;
+  
+  read    = buffer_read_escaped( buffer, c, data, len, delim, ndelim, esc, nesc ),
+  written = buffer->length - start;
+  
+  if( written ) {
+    byte[0] = written;
+    /*printf( "Push oparg %i:%s\n", (int) (pattern->proglen - start), &(pattern->program[start]) );*/
+    buffer->data[start-1] = byte[0];
+    buffer_append( buffer, &(byte[0]), 1 );
+  }
+  
+  return read;
 }
 
 /**
  * @brief Compile unary operations.
  * Handles ?, *, **, /
- * @param pattern the pattern to write to.
+ * @param buffer the buffer to write to.
  * @param expr the input string.
  * @return the number of bytes read from the input string.
  */
-static size_t fnmatch__compiler_unary( fnmatch_pattern_t* pattern, const char* expr ) {
+static size_t fnmatch__compiler_unary( buffer_t* buffer, const char* expr ) {
   if( expr[0] == FNMATCH_ONE ) {
-      fnmatch__compiler_opcode( pattern, FNMATCH_OP_ONE );
+      fnmatch__compiler_opcode( buffer, FNMATCH_OP_ONE );
       return 1;
   } else if( expr[0] == FNMATCH_ANY ) {
     if( expr[1] == FNMATCH_DEEP ) {
-      fnmatch__compiler_opcode( pattern, FNMATCH_OP_DEEP );
+      fnmatch__compiler_opcode( buffer, FNMATCH_OP_DEEP );
       return 2;
     } else {
-      fnmatch__compiler_opcode( pattern, FNMATCH_OP_ANY );
+      fnmatch__compiler_opcode( buffer, FNMATCH_OP_ANY );
       return 1;
     }
   } else if( expr[0] == FNMATCH_SEP ) {
-    fnmatch__compiler_opcode( pattern, FNMATCH_OP_SEP );
+    fnmatch__compiler_opcode( buffer, FNMATCH_OP_SEP );
     return 1;
   } else if( expr[0] == '\0' ) {
-    fnmatch__compiler_opcode( pattern, FNMATCH_OP_END );
+    fnmatch__compiler_opcode( buffer, FNMATCH_OP_END );
     return 0;
   }
   return 0;
@@ -91,65 +79,58 @@ static size_t fnmatch__compiler_unary( fnmatch_pattern_t* pattern, const char* e
 /**
  * Compile character sets and ranges.
  * Special characters "[]" must be escaped.
- * @param buf  the buffer to write to.
+ * @param buffer the buffer to write to.
  * @param expr the input string.
  * @return the number of bytes read from the input string.
  */
-static size_t fnmatch__compiler_chars( fnmatch_pattern_t* pattern, const char* expr ) {
+static size_t fnmatch__compiler_chars( buffer_t* buffer, const char* expr ) {
   static const char del[2] = { FNMATCH_CHARS_END, '\0' };
   static const char esc[4] = { FNMATCH_CHARS_START, FNMATCH_CHARS_END, FNMATCH_ESCAPE };
-  size_t length;
+  size_t read;
   
   assert( expr[0] == FNMATCH_CHARS_START );
-  fnmatch__compiler_opcode( pattern, FNMATCH_OP_CHARS );
-  length = fnmatch__compiler_oparg( pattern, FNMATCH_ESCAPE, expr+1, 127, del, 2, esc, 3 );
-  assert( expr[length+1] == FNMATCH_CHARS_END );
-  return length + 2;
+  fnmatch__compiler_opcode( buffer, FNMATCH_OP_CHARS );
+  read = fnmatch__compiler_oparg( buffer, FNMATCH_ESCAPE, expr+1, 127, del, 2, esc, 3 );
+  assert( expr[read+1] == FNMATCH_CHARS_END );
+  return read + 2;
 }
 
 /**
  * Compile fixed strings.
  * Special characters "?*[/" must be escaped.
- * @param buf  the buffer to write to.
+ * @param buffer the buffer to write to.
  * @param expr the input string.
  * @return the number of bytes read from the input string.
  */
-static size_t fnmatch__compiler_fixed( fnmatch_pattern_t* pattern, const char* expr ) {
+static size_t fnmatch__compiler_fixed( buffer_t* buffer, const char* expr ) {
   static const char del[5] = { FNMATCH_ONE, FNMATCH_ANY, FNMATCH_SEP, FNMATCH_CHARS_START, '\0' };
   static const char esc[5] = { FNMATCH_ONE, FNMATCH_ANY, FNMATCH_SEP, FNMATCH_CHARS_START, FNMATCH_ESCAPE };
-  size_t length;
+  size_t read;
   
-  fnmatch__compiler_opcode( pattern, FNMATCH_OP_FIXED );
-  length = fnmatch__compiler_oparg( pattern, FNMATCH_ESCAPE, expr, 127, del, 5, esc, 5 );
-  return length;
+  fnmatch__compiler_opcode( buffer, FNMATCH_OP_FIXED );
+  read = fnmatch__compiler_oparg( buffer, FNMATCH_ESCAPE, expr, 127, del, 5, esc, 5 );
+  return read;
 }
 
 /**
  * Compile an expression and store the compiled program inside the pattern struct.
- * @param pattern the pattern to compile to.
+ * @param length an optional pointer to store the length of the pattern.
  * @param expr the expression to compile.
+ * @return the compiled pattern program.
  */
-fnmatch_state_t fnmatch_compile( fnmatch_pattern_t* pattern ) {
-  const char* expr = pattern->pattern;
+void* fnmatch_compile( const char* expr, size_t* length ) {
+  buffer_t buffer = BUFFER_INIT;
   
-  size_t length = 0;
+  size_t read   = 0;
   size_t mchars = 0;
   size_t groups = 0;
   size_t parts  = 0;
   
-  if( pattern->program ) free( pattern->program );
-  pattern->program = NULL;
-  pattern->proglen = 0;
-  pattern->alloc   = 0;
-  pattern->groups  = 0;
-  pattern->mchars  = 0;
-  pattern->parts   = 0;
-  
   do {
-    expr += length;
+    expr += read;
     switch( *expr ) {
       case FNMATCH_SEP:
-        length  = fnmatch__compiler_unary( pattern, expr );
+        read    = fnmatch__compiler_unary( &buffer, expr );
         mchars += 1;
         parts  += 1;
         break;
@@ -157,26 +138,27 @@ fnmatch_state_t fnmatch_compile( fnmatch_pattern_t* pattern ) {
         mchars += 1;
       case FNMATCH_ANY:
     /*case FNMATCH_DEEP:*/
-        length  = fnmatch__compiler_unary( pattern, expr );
+        read    = fnmatch__compiler_unary( &buffer, expr );
         groups += 1;
         break;
       case FNMATCH_CHARS_START:
-        length  = fnmatch__compiler_chars( pattern, expr );
+        read    = fnmatch__compiler_chars( &buffer, expr );
         mchars += 1;
         groups += 1;
         break;
       default:
-        length  = fnmatch__compiler_fixed( pattern, expr );
-        mchars += length;
+        read    = fnmatch__compiler_fixed( &buffer, expr );
+        mchars += read;
         break;
       case '\0':
-        length  = fnmatch__compiler_unary( pattern, expr );
+        read    = fnmatch__compiler_unary( &buffer, expr );
         break;
     }
   } while( *expr != '\0' );
-
+/*
   pattern->mchars = mchars;
   pattern->groups = groups;
   pattern->parts  = parts;
-  return FNMATCH_CONTINUE;
+ */
+  return buffer_detach( &buffer, length );
 }

@@ -10,7 +10,8 @@
 #define FNMATCH_DEEP '*'
 #define FNMATCH_SEP '/'
 
-fnmatch_state_t fnmatch_compile( fnmatch_pattern_t *pattern );
+void* fnmatch_compile( const char* expr, size_t* length );
+
 fnmatch_state_t fnmatch_vm_next( fnmatch_context_t *context );
 fnmatch_state_t fnmatch_vm_prev( fnmatch_context_t *context );
 fnmatch_state_t fnmatch_vm_retry( fnmatch_context_t *context );
