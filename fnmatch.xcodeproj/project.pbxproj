@@ -25,7 +25,6 @@
 		597B15A515193E0400229222 /* vm.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15A415193E0400229222 /* vm.c */; };
 		597B15A7151A61E300229222 /* internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 597B15A6151A61E300229222 /* internal.h */; settings = {ATTRIBUTES = (); }; };
 		597B15AD152893FF00229222 /* compiler.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15AC152893FF00229222 /* compiler.c */; };
-		597B15AF1528A0E800229222 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 597B15AE1528A0E800229222 /* util.c */; };
 		598AB10F152B61D300CC6DEF /* posix.c in Sources */ = {isa = PBXBuildFile; fileRef = 598AB10E152B61D300CC6DEF /* posix.c */; };
 /* End PBXBuildFile section */
 
@@ -64,7 +63,6 @@
 		597B15A415193E0400229222 /* vm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vm.c; sourceTree = "<group>"; };
 		597B15A6151A61E300229222 /* internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = internal.h; sourceTree = "<group>"; };
 		597B15AC152893FF00229222 /* compiler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = compiler.c; sourceTree = "<group>"; };
-		597B15AE1528A0E800229222 /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = util.c; sourceTree = "<group>"; };
 		598AB10E152B61D300CC6DEF /* posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = posix.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -150,7 +148,6 @@
 				597B159E1519384100229222 /* pattern.c */,
 				597B15A01519385200229222 /* context.c */,
 				597B15A6151A61E300229222 /* internal.h */,
-				597B15AE1528A0E800229222 /* util.c */,
 				597B15A21519387D00229222 /* scanner.c */,
 				596483AD1537588A0000E0FB /* match.c */,
 				597B15A415193E0400229222 /* vm.c */,
@@ -283,7 +280,6 @@
 				597B15A31519387D00229222 /* scanner.c in Sources */,
 				597B15A515193E0400229222 /* vm.c in Sources */,
 				597B15AD152893FF00229222 /* compiler.c in Sources */,
-				597B15AF1528A0E800229222 /* util.c in Sources */,
 				598AB10F152B61D300CC6DEF /* posix.c in Sources */,
 				596483AE1537588A0000E0FB /* match.c in Sources */,
 			);
