@@ -110,7 +110,7 @@ TEST_EXTERN test_result_t test_suite_run( const test_suite_t* suite );
 #define ASSERTEQ(a,b,...) ASSERTBASE((a) == (b),"`" #a "' does not equal `" #b "'!\n" __VA_ARGS__)
 #define ASSERTLT(a,b,...) ASSERTBASE((a) < (b),"`" #a "' is not less than `" #b "'!\n" __VA_ARGS__)
 #define ASSERTGT(a,b,...) ASSERTBASE((a) > (b),"`" #a "' is not greater than`" #b "'!\n" __VA_ARGS__)
-#define ASSERTSTRCMP(a,op,b) ((a!=NULL) && (b!=NULL) && strcmp(a,b) op 0)
+#define ASSERTSTRCMP(a,op,b) ((a==b) || (a!=NULL) && (b!=NULL) && strcmp(a,b) op 0)
 #define ASSERTSTREQ(a,b,...) ASSERTBASE(ASSERTSTRCMP(a,==,b),"Strings `" #a "' and `" #b "' are not equal!\n" __VA_ARGS__)
 #define ASSERTSTRLT(a,b,...) ASSERTBASE(ASSERTSTRCMP(a,<,b),"String `" #a "' is not `less than' string `" #b "'!\n" __VA_ARGS__)
 #define ASSERTSTRGT(a,b,...) ASSERTBASE(ASSERTSTRCMP(a,>,b),"String `" #a "' is not `greater than' string `" #b "'!\n" __VA_ARGS__)
