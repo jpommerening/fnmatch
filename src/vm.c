@@ -97,10 +97,13 @@ static fnmatch_state_t fnmatch__vm_fixed( fnmatch_context_t* context, const char
 
 static fnmatch_state_t fnmatch__vm_chars( fnmatch_context_t* context, const char* str,
                                           size_t oplen, const char* oparg ) {
-  char c;
+  char c, neg = 0;
   size_t i = 0;
 
-  if( oparg[0] == '!' ) i=1;
+  if( oplen && oparg[0] == FNMATCH_CHARS_NEGATE ) {
+    i   = 1;
+    neg = 1;
+  }
 
   for( ; i<oplen; i++ ) {
     c = oparg[i];
@@ -108,20 +111,19 @@ static fnmatch_state_t fnmatch__vm_chars( fnmatch_context_t* context, const char
     if( i<(oplen-1) ) {
       if( c == FNMATCH_ESCAPE ) {
         i++;
-        c = oparg[i];
       } else if( (c == '-') && (i > 0) ) {
         if( (str[0] > oparg[i-1]) &&
             (str[0] < oparg[i+1]) ) {
-          return fnmatch__vm_cond( context, oparg[0] != FNMATCH_CHARS_NEGATE, 1 );
+          return fnmatch__vm_cond( context, !neg, 1 );
         }
       }
     }
     
     if( str[0] == oparg[i] ) {
-      return fnmatch__vm_cond( context, oparg[0] != FNMATCH_CHARS_NEGATE, 1 );
+      return fnmatch__vm_cond( context, !neg, 1 );
     }
   }
-  return fnmatch__vm_cond( context, oparg[0] == FNMATCH_CHARS_NEGATE, 1 );
+  return fnmatch__vm_cond( context, neg, 1 );
 }
 
 static fnmatch_state_t fnmatch__vm_one( fnmatch_context_t* context, const char* str ) {
