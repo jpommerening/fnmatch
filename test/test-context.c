@@ -8,7 +8,7 @@ TEST( test_context_single ) {
   const char* str;
   
   fnmatch_pattern_init( &pattern );
-  ASSERTEQ( FNMATCH_CONTINUE, fnmatch_pattern_compile( &pattern, "test/**.[hc]" ),
+  ASSERTEQ( FNMATCH_CONTINUE, fnmatch_pattern_compile( &pattern, "test/**.[hc]", 0 ),
             "Failed to compile pattern.\n" );
   fnmatch_context_init( &context, &pattern );
 
@@ -34,7 +34,7 @@ TEST( test_context_multiple ) {
   const char* str;
   
   fnmatch_pattern_init( &pattern );
-  ASSERTEQ( FNMATCH_CONTINUE, fnmatch_pattern_compile( &pattern, "test/**.[hc]" ),
+  ASSERTEQ( FNMATCH_CONTINUE, fnmatch_pattern_compile( &pattern, "test/**.[hc]", 0 ),
             "Failed to compile pattern.\n" );
   fnmatch_context_init( &context, &pattern );
 

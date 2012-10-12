@@ -111,11 +111,13 @@ static size_t fnmatch__compiler_fixed( buffer_t* buffer, const char* expr ) {
 
 /**
  * Compile an expression and store the compiled program inside the pattern struct.
- * @param length an optional pointer to store the length of the pattern.
  * @param expr the expression to compile.
+ * @param flags some flags for compilation.
+ * @param length an optional pointer to store the length of the pattern.
+ * @param stats an optional pointer to store the metrics of the pattern.
  * @return the compiled pattern program.
  */
-void* fnmatch_compile( const char* expr, size_t* length, fnmatch_stats_t* stats ) {
+void* fnmatch_compile( const char* expr, int flags, size_t* length, fnmatch_stats_t* stats ) {
   buffer_t buffer = BUFFER_INIT;
   
   size_t read   = 0;
@@ -153,9 +155,11 @@ void* fnmatch_compile( const char* expr, size_t* length, fnmatch_stats_t* stats 
     }
   } while( *expr != '\0' );
 
-  stats->mchars = mchars;
-  stats->groups = groups;
-  stats->parts  = parts;
-
+  if( stats != NULL ) {
+    stats->mchars = mchars;
+    stats->groups = groups;
+    stats->parts  = parts;
+  }
+  
   return buffer_detach( &buffer, length );
 }

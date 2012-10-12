@@ -97,7 +97,7 @@ TEST( test_scanner, _data, const test_scanner_data_t* data ) {
   test_scanner_count_t count = { data, 0, 0, 0 };
   
   fnmatch_pattern_init( &pattern );
-  ASSERTEQ( FNMATCH_CONTINUE, fnmatch_pattern_compile( &pattern, data->expr ) );
+  ASSERTEQ( FNMATCH_CONTINUE, fnmatch_pattern_compile( &pattern, data->expr, 0 ) );
   fnmatch_scanner_init( &scanner, &pattern, &test_push_cb, &test_pop_cb, &test_match_cb );
   
   fnmatch_scanner_match( &scanner, &count );

@@ -28,7 +28,7 @@ void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern ) {
   fnmatch__pattern_free( pattern );
 }
 
-fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr ) {
+fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr, int flags ) {
   void*  program;
   size_t proglen;
   fnmatch_stats_t stats;
@@ -36,7 +36,7 @@ fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char*
   assert( pattern );
   assert( expr );
   
-  program = fnmatch_compile( expr, &proglen, &stats );
+  program = fnmatch_compile( expr, flags, &proglen, &stats );
   
   if( program == NULL )
     return FNMATCH_ERROR;

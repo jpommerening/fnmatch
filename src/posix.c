@@ -11,7 +11,7 @@ int fnmatch( const char* expr, const char* str, int flags ) {
   if(  (flags & FNM_NOESCAPE) ) return FNM_NOSYS;
 
   fnmatch_pattern_init( &pattern );
-  state = fnmatch_pattern_compile( &pattern, expr );
+  state = fnmatch_pattern_compile( &pattern, expr, flags );
   if( state == FNMATCH_ERROR ) return -2;
   state = fnmatch_pattern_match( &pattern, str );
   fnmatch_pattern_destroy( &pattern );

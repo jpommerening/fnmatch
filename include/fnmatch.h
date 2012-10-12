@@ -76,16 +76,16 @@ struct fnmatch_stats_s {
 };
   
 struct fnmatch_pattern_s {
-  char*  pattern;
-  char*  program;
-  size_t proglen;
+  char*  pattern; /* original pattern expression */
+  char*  program; /* compiled matching program */
+  size_t proglen; /* number of bytes inside program */
   
   fnmatch_stats_t stats;
 };
 
 struct fnmatch_frame_s {
-  size_t opptr;
-  size_t offset;
+  size_t opptr;  /* offset of the current operation inside the program buffer */
+  size_t offset; /* offset of the currently matched character */
 };
 
 struct fnmatch_context_s {
@@ -94,12 +94,12 @@ struct fnmatch_context_s {
 
   fnmatch_state_t  state;
   fnmatch_opcode_t opcode;
-  fnmatch_frame_t  op;
-  fnmatch_frame_t  any;
-  fnmatch_frame_t  deep;
+  fnmatch_frame_t  op;   /* current execution context */
+  fnmatch_frame_t  any;  /* last occurance of FNMATCH_OP_ANY */
+  fnmatch_frame_t  deep; /* last occurance of FNMATCH_OP_DEEP */
 
-  int nmatch;
-  int nnomatch;
+  int nmatch;   /* number of matching strings so far */
+  int nnomatch; /* number of non-matching strings */
 };
 
 struct fnmatch_scanner_s {
@@ -123,7 +123,7 @@ struct fnmatch_match_s {
  */
 FNMATCH_EXTERN void fnmatch_pattern_init( fnmatch_pattern_t* pattern );
 FNMATCH_EXTERN void fnmatch_pattern_destroy( fnmatch_pattern_t* pattern );
-FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr );
+FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_compile( fnmatch_pattern_t* pattern, const char* expr, int flags );
 FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_match( fnmatch_pattern_t* pattern, const char* str );
 FNMATCH_EXTERN fnmatch_state_t fnmatch_pattern_render( fnmatch_pattern_t* pattern, fnmatch_match_t* match );
 /** @} */

@@ -51,7 +51,7 @@ TEST( test_pattern, _data, const test_pattern_t* data ) {
   
 /*MSG("%s, %s, %s", data->expr, data->matchstr, data->nomatchstr);*/
   
-  state = fnmatch_pattern_compile( &pattern, data->expr );
+  state = fnmatch_pattern_compile( &pattern, data->expr, 0 );
   ASSERTEQ( state, FNMATCH_CONTINUE, "Could not compile pattern `%s'.\n", data->expr );
 
   state = fnmatch_pattern_match( &pattern, data->matchstr );
