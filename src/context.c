@@ -10,7 +10,7 @@ void fnmatch_context_init( fnmatch_context_t* context, fnmatch_pattern_t* patter
   assert( context );
   assert( pattern );
   
-  buffer_init( &(context->buffer), 0 /* pattern->mchars */ );
+  buffer_init( &(context->buffer), pattern->stats.mchars );
   context->pattern = pattern;
   
   fnmatch_context_reset( context );
@@ -118,7 +118,6 @@ const char * fnmatch_context_pop( fnmatch_context_t* context ) {
     context->state = FNMATCH_ERROR;
     return NULL;
   }
-
 
   fnmatch_vm_rewind( context );
   context->state = FNMATCH_CONTINUE;
